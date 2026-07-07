@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Menu, X, Phone } from 'lucide-react'
 
 const links = [
   { label: 'Ana Sayfa', href: '#hero' },
@@ -13,108 +13,102 @@ const links = [
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const { scrollYProgress } = useScroll()
-  const progressWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40)
+    const onScroll = () => setScrolled(window.scrollY > 24)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Lock body scroll when mobile menu open
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [open])
+
   const handleNav = (href: string) => {
     setOpen(false)
-    const el = document.querySelector(href)
-    el?.scrollIntoView({ behavior: 'smooth' })
+    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  // Over the hero video the bar is transparent with white text; once scrolled it goes light
+  const onDark = !scrolled && !open
 
   return (
     <>
-      {/* Progress bar */}
-      <motion.div
-        className="fixed top-0 left-0 h-[2px] z-[60]"
-        style={{ width: progressWidth, background: 'linear-gradient(90deg, var(--gold-dark), var(--gold-light))' }}
-      />
-
       <motion.nav
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+        initial={{ y: -72 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="fixed top-0 left-0 right-0 z-50 transition-colors duration-300"
         style={{
-          background: scrolled ? 'rgba(8,8,8,0.95)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(20px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(200,169,110,0.1)' : '1px solid transparent',
+          background: onDark ? 'transparent' : 'rgba(250,250,247,0.92)',
+          backdropFilter: onDark ? 'none' : 'blur(12px)',
+          borderBottom: onDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid var(--border)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <button
-              onClick={() => handleNav('#hero')}
-              className="flex items-center gap-3 group"
-            >
-              <div className="relative w-9 h-9">
-                <div
-                  className="absolute inset-0 rounded rotate-45"
-                  style={{ background: 'var(--gold)', opacity: 0.9 }}
-                />
-                <span
-                  className="absolute inset-0 flex items-center justify-center text-sm font-black"
-                  style={{ color: 'var(--dark)' }}
-                >
-                  Gİ
-                </span>
+            <button onClick={() => handleNav('#hero')} className="flex items-center gap-3 cursor-pointer">
+              <div
+                className="w-9 h-9 flex items-center justify-center text-sm font-black shrink-0 font-display transition-colors duration-300"
+                style={{
+                  background: onDark ? '#fff' : 'var(--ink)',
+                  color: onDark ? 'var(--ink)' : '#fff',
+                }}
+              >
+                Gİ
               </div>
               <span
-                className="text-lg font-bold tracking-wider hidden sm:block"
-                style={{ color: 'var(--warm-white)', fontFamily: 'Montserrat, sans-serif' }}
+                className="text-base lg:text-lg font-extrabold tracking-tight font-display transition-colors duration-300"
+                style={{ color: onDark ? '#fff' : 'var(--text)' }}
               >
-                GÜVENAY <span style={{ color: 'var(--gold)' }}>İNŞAAT</span>
+                Güvenay İnşaat
               </span>
             </button>
 
             {/* Desktop links */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-7">
               {links.map((link) => (
                 <button
                   key={link.href}
                   onClick={() => handleNav(link.href)}
-                  className="relative text-sm font-medium tracking-widest uppercase group"
-                  style={{ color: 'rgba(245,240,232,0.7)' }}
+                  className="text-[13px] font-semibold uppercase tracking-[0.12em] cursor-pointer transition-colors duration-200"
+                  style={{ color: onDark ? 'rgba(255,255,255,0.85)' : 'var(--text-soft)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = onDark ? '#fff' : 'var(--accent)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = onDark ? 'rgba(255,255,255,0.85)' : 'var(--text-soft)')}
                 >
-                  <span className="transition-colors duration-300 group-hover:text-[var(--gold-light)]">
-                    {link.label}
-                  </span>
-                  <span
-                    className="absolute -bottom-1 left-0 h-[1px] w-0 group-hover:w-full transition-all duration-300"
-                    style={{ background: 'var(--gold)' }}
-                  />
+                  {link.label}
                 </button>
               ))}
             </div>
 
-            {/* CTA + Hamburger */}
-            <div className="flex items-center gap-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+            {/* CTA + hamburger */}
+            <div className="flex items-center gap-2">
+              <a
+                href="tel:+902125550100"
+                className="hidden md:flex lg:hidden items-center gap-2 text-sm font-semibold transition-colors"
+                style={{ color: onDark ? '#fff' : 'var(--text)' }}
+              >
+                <Phone size={15} style={{ color: onDark ? '#fff' : 'var(--accent)' }} />
+                (212) 555 0100
+              </a>
+              <button
                 onClick={() => handleNav('#contact')}
-                className="hidden lg:flex items-center gap-2 px-5 py-2.5 text-xs font-semibold tracking-widest uppercase"
-                style={{
-                  background: 'var(--gold)',
-                  color: 'var(--dark)',
-                  borderRadius: '2px',
-                }}
+                className={`hidden lg:inline-flex !py-2.5 !px-6 ${onDark ? 'btn-on-dark' : 'btn-primary'}`}
               >
                 Teklif Al
-              </motion.button>
-
+              </button>
               <button
-                className="lg:hidden p-2"
-                style={{ color: 'var(--gold)' }}
+                className="lg:hidden w-11 h-11 flex items-center justify-center cursor-pointer transition-colors"
+                style={{
+                  background: open ? 'var(--ink)' : 'transparent',
+                  color: open ? '#fff' : onDark ? '#fff' : 'var(--text)',
+                  border: onDark && !open ? '1px solid rgba(255,255,255,0.35)' : '1px solid var(--border-strong)',
+                }}
                 onClick={() => setOpen(!open)}
-                aria-label="Menu"
+                aria-label="Menü"
               >
                 {open ? <X size={22} /> : <Menu size={22} />}
               </button>
@@ -127,44 +121,44 @@ export default function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="fixed inset-0 z-40 flex flex-col pt-20 px-8"
-            style={{ background: 'rgba(8,8,8,0.98)', backdropFilter: 'blur(30px)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-40 flex flex-col pt-24 px-6 pb-8 overflow-y-auto"
+            style={{ background: 'var(--bg)' }}
           >
-            <div className="flex flex-col gap-6 mt-8">
+            <div className="flex flex-col">
               {links.map((link, i) => (
                 <motion.button
                   key={link.href}
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.08 }}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
                   onClick={() => handleNav(link.href)}
-                  className="text-left text-2xl font-bold tracking-wider uppercase"
-                  style={{ color: 'var(--warm-white)' }}
+                  className="flex items-center justify-between text-left text-2xl font-bold font-display py-5 cursor-pointer hairline-bottom"
+                  style={{ color: 'var(--text)' }}
                 >
-                  <span
-                    className="block border-b pb-4"
-                    style={{ borderColor: 'rgba(200,169,110,0.15)' }}
-                  >
-                    {link.label}
-                  </span>
+                  {link.label}
+                  <span style={{ color: 'var(--accent)' }}>→</span>
                 </motion.button>
               ))}
             </div>
 
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              onClick={() => handleNav('#contact')}
-              className="mt-10 py-4 text-sm font-semibold tracking-widest uppercase"
-              style={{ background: 'var(--gold)', color: 'var(--dark)', borderRadius: '2px' }}
+              transition={{ delay: 0.3 }}
+              className="mt-auto pt-8 flex flex-col gap-3"
             >
-              Teklif Al
-            </motion.button>
+              <a href="tel:+902125550100" className="btn-secondary w-full">
+                <Phone size={16} />
+                (212) 555 0100
+              </a>
+              <button onClick={() => handleNav('#contact')} className="btn-primary w-full">
+                Ücretsiz Teklif Al
+              </button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

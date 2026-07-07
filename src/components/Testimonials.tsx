@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const testimonials = [
   {
@@ -8,36 +8,28 @@ const testimonials = [
     name: 'Ahmet Yılmaz',
     role: 'Güvenay Residence Sahibi',
     text: 'Güvenay İnşaat, hayalimizin ötesinde bir ev teslim etti. Malzeme kalitesinden işçiliğe kadar her detay kusursuzdı. 3 yıl önce taşındık, hiçbir sorunla karşılaşmadık.',
-    rating: 5,
     initials: 'AY',
-    color: '#4A90D9',
   },
   {
     id: 2,
     name: 'Fatma Kaya',
     role: 'Çankaya Ofis Kompleksi, Genel Müdür',
-    text: '20 yıldır farklı inşaat firmalarıyla çalıştım. Güvenay\'ın proje yönetimi anlayışı ve zamanında teslim hassasiyeti rakipsiz. Bir daha onlarla çalışmaktan mutluluk duyarım.',
-    rating: 5,
+    text: "20 yıldır farklı inşaat firmalarıyla çalıştım. Güvenay'ın proje yönetimi anlayışı ve zamanında teslim hassasiyeti rakipsiz. Bir daha onlarla çalışmaktan mutluluk duyarım.",
     initials: 'FK',
-    color: '#C8A96E',
   },
   {
     id: 3,
     name: 'Mehmet Demir',
     role: 'Bursa Sanayi Tesisi Sahibi',
     text: 'Endüstriyel tesisimizi planladığından 2 ay erken, bütçe dahilinde tamamladılar. Mühendis ekibi her adımda yanımızdaydı. Kesinlikle tavsiye ediyorum.',
-    rating: 5,
     initials: 'MD',
-    color: '#6BCF8F',
   },
   {
     id: 4,
     name: 'Selin Arslan',
     role: 'İzmir AVM, Operasyon Direktörü',
-    text: 'Alışveriş merkezimiz, Güvenay İnşaat sayesinde İzmir\'in sembol yapılarından biri oldu. Mimari detaylara gösterdikleri özen ve yaratıcı çözümleri etkileyiciydi.',
-    rating: 5,
+    text: "Alışveriş merkezimiz, Güvenay İnşaat sayesinde İzmir'in sembol yapılarından biri oldu. Mimari detaylara gösterdikleri özen ve yaratıcı çözümleri etkileyiciydi.",
     initials: 'SA',
-    color: '#A855F7',
   },
 ]
 
@@ -49,7 +41,7 @@ export default function Testimonials() {
     const timer = setInterval(() => {
       setDirection(1)
       setCurrent((c) => (c + 1) % testimonials.length)
-    }, 5000)
+    }, 6000)
     return () => clearInterval(timer)
   }, [])
 
@@ -59,48 +51,36 @@ export default function Testimonials() {
   }
 
   const variants = {
-    enter: (d: number) => ({ opacity: 0, x: d * 60, scale: 0.96 }),
-    center: { opacity: 1, x: 0, scale: 1 },
-    exit: (d: number) => ({ opacity: 0, x: d * -60, scale: 0.96 }),
+    enter: (d: number) => ({ opacity: 0, x: d * 40 }),
+    center: { opacity: 1, x: 0 },
+    exit: (d: number) => ({ opacity: 0, x: d * -40 }),
   }
 
-  return (
-    <section
-      className="relative py-24 lg:py-40 overflow-hidden"
-      style={{ background: 'var(--dark)' }}
-    >
-      {/* Radial glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(200,169,110,0.04) 0%, transparent 70%)' }}
-      />
+  const t = testimonials[current]
 
-      <div className="max-w-4xl mx-auto px-6 lg:px-8">
+  return (
+    <section className="relative py-20 lg:py-32" style={{ background: 'var(--bg)' }}>
+      <div className="max-w-4xl mx-auto px-5 lg:px-8">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="mb-12 lg:mb-16"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="h-px w-10" style={{ background: 'var(--gold)' }} />
-            <span className="text-xs font-semibold tracking-[0.3em] uppercase" style={{ color: 'var(--gold)' }}>
-              Müşteri Yorumları
-            </span>
-            <div className="h-px w-10" style={{ background: 'var(--gold)' }} />
-          </div>
-          <h2
-            className="text-4xl lg:text-5xl font-black"
-            style={{ color: 'var(--warm-white)', fontFamily: 'Montserrat, sans-serif' }}
-          >
-            Müşterilerimiz <span className="gradient-text">Ne Diyor?</span>
+          <span className="eyebrow">Müşteri Yorumları</span>
+          <h2 className="font-display text-4xl lg:text-5xl font-black tracking-tight mt-5" style={{ color: 'var(--text)' }}>
+            Müşterilerimiz Ne Diyor?
           </h2>
         </motion.div>
 
-        {/* Testimonial card */}
-        <div className="relative min-h-[300px] flex items-center justify-center">
+        {/* Large quote — minimal, no card */}
+        <div className="relative min-h-[280px] lg:min-h-[240px] flex flex-col">
+          <span className="font-display text-7xl lg:text-8xl font-black leading-none select-none absolute -top-6 -left-1 lg:-left-10" style={{ color: 'var(--accent-soft)' }} aria-hidden="true">
+            "
+          </span>
+
           <AnimatePresence custom={direction} mode="wait">
             <motion.div
               key={current}
@@ -109,60 +89,23 @@ export default function Testimonials() {
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="absolute w-full"
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+              className="flex flex-col flex-1"
             >
-              <div
-                className="relative p-8 lg:p-12"
-                style={{
-                  background: 'var(--dark-3)',
-                  border: '1px solid rgba(200,169,110,0.1)',
-                  borderRadius: '4px',
-                }}
-              >
-                {/* Quote icon */}
+              <blockquote className="font-display text-xl lg:text-3xl leading-relaxed lg:leading-snug font-medium flex-1" style={{ color: 'var(--text)' }}>
+                {t.text}
+              </blockquote>
+
+              <div className="flex items-center gap-4 mt-8 pt-6 hairline-top">
                 <div
-                  className="absolute top-8 right-8 opacity-10"
-                  style={{ color: testimonials[current].color }}
+                  className="w-12 h-12 flex items-center justify-center text-sm font-extrabold shrink-0"
+                  style={{ background: 'var(--ink)', color: '#fff' }}
                 >
-                  <Quote size={60} />
+                  {t.initials}
                 </div>
-
-                {/* Stars */}
-                <div className="flex gap-1 mb-6">
-                  {Array.from({ length: testimonials[current].rating }).map((_, i) => (
-                    <Star key={i} size={16} fill={testimonials[current].color} style={{ color: testimonials[current].color }} />
-                  ))}
-                </div>
-
-                {/* Text */}
-                <blockquote
-                  className="text-lg lg:text-xl leading-relaxed mb-8 relative z-10"
-                  style={{ color: 'var(--warm-white)' }}
-                >
-                  "{testimonials[current].text}"
-                </blockquote>
-
-                {/* Author */}
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-black flex-shrink-0"
-                    style={{
-                      background: `${testimonials[current].color}20`,
-                      color: testimonials[current].color,
-                      border: `1px solid ${testimonials[current].color}30`,
-                    }}
-                  >
-                    {testimonials[current].initials}
-                  </div>
-                  <div>
-                    <div className="font-bold text-sm" style={{ color: 'var(--warm-white)' }}>
-                      {testimonials[current].name}
-                    </div>
-                    <div className="text-xs" style={{ color: 'rgba(245,240,232,0.5)' }}>
-                      {testimonials[current].role}
-                    </div>
-                  </div>
+                <div>
+                  <div className="font-bold text-sm" style={{ color: 'var(--text)' }}>{t.name}</div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-dim)' }}>{t.role}</div>
                 </div>
               </div>
             </motion.div>
@@ -170,44 +113,41 @@ export default function Testimonials() {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-center gap-6 mt-8">
-          <button
-            onClick={() => go(-1)}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
-            style={{
-              border: '1px solid rgba(200,169,110,0.3)',
-              color: 'var(--gold)',
-            }}
-          >
-            <ChevronLeft size={18} />
-          </button>
-
-          {/* Dots */}
-          <div className="flex gap-2">
+        <div className="flex items-center justify-between mt-9">
+          <div className="flex gap-2.5">
             {testimonials.map((_, i) => (
               <button
                 key={i}
                 onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i) }}
-                className="rounded-full transition-all duration-300"
+                className="cursor-pointer transition-all duration-300"
                 style={{
-                  width: i === current ? 24 : 8,
-                  height: 8,
-                  background: i === current ? 'var(--gold)' : 'rgba(200,169,110,0.2)',
+                  width: i === current ? 28 : 12,
+                  height: 2,
+                  background: i === current ? 'var(--accent)' : 'var(--border-strong)',
                 }}
+                aria-label={`Yorum ${i + 1}`}
               />
             ))}
           </div>
 
-          <button
-            onClick={() => go(1)}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
-            style={{
-              border: '1px solid rgba(200,169,110,0.3)',
-              color: 'var(--gold)',
-            }}
-          >
-            <ChevronRight size={18} />
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => go(-1)}
+              className="w-11 h-11 flex items-center justify-center cursor-pointer transition-colors duration-300 hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              style={{ border: '1px solid var(--border-strong)', color: 'var(--text)' }}
+              aria-label="Önceki yorum"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={() => go(1)}
+              className="w-11 h-11 flex items-center justify-center cursor-pointer transition-colors duration-300 hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              style={{ border: '1px solid var(--border-strong)', color: 'var(--text)' }}
+              aria-label="Sonraki yorum"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
     </section>

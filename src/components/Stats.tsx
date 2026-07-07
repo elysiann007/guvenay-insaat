@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react'
 import { motion, useInView, useMotionValue, animate, useTransform } from 'framer-motion'
 
 const stats = [
-  { value: 30, suffix: '+', label: 'Yıl Deneyim', desc: '1994\'ten bu yana sektördeyiz' },
+  { value: 30, suffix: '+', label: 'Yıl Deneyim', desc: "1994'ten bu yana sektördeyiz" },
   { value: 500, suffix: '+', label: 'Tamamlanan Proje', desc: 'Her biri bir başarı hikayesi' },
-  { value: 50, suffix: '+', label: 'Aktif Şantiye', desc: 'Türkiye\'nin dört bir yanında' },
+  { value: 50, suffix: '+', label: 'Aktif Şantiye', desc: "Türkiye'nin dört bir yanında" },
   { value: 10000, suffix: '+', label: 'Mutlu Aile', desc: 'Hayallerini gerçeğe dönüştürdük' },
 ]
 
@@ -20,10 +20,7 @@ function CountUp({ target, suffix }: { target: number; suffix: string }) {
 
   useEffect(() => {
     if (isInView) {
-      const controls = animate(count, target, {
-        duration: 2.2,
-        ease: [0, 0.5, 1, 1],
-      })
+      const controls = animate(count, target, { duration: 2.2, ease: [0, 0.5, 1, 1] })
       return controls.stop
     }
   }, [isInView, count, target])
@@ -38,94 +35,40 @@ function CountUp({ target, suffix }: { target: number; suffix: string }) {
 
 export default function Stats() {
   return (
-    <section
-      className="relative py-24 lg:py-32 overflow-hidden"
-      style={{ background: 'var(--dark-2)' }}
-    >
-      {/* Gold gradient top */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, var(--gold), transparent)' }}
-      />
-
-      {/* Background decoration */}
-      <div className="absolute inset-0 hero-grid opacity-30" />
-      <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, rgba(200,169,110,0.04) 0%, transparent 70%)' }}
-      />
-
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <section className="relative py-20 lg:py-28" style={{ background: 'var(--ink)' }}>
+      <div className="max-w-7xl mx-auto px-5 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.6 }}
+          className="mb-12 lg:mb-16"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="h-px w-10" style={{ background: 'var(--gold)' }} />
-            <span className="text-xs font-semibold tracking-[0.3em] uppercase" style={{ color: 'var(--gold)' }}>
-              Rakamlarla Güvenay
-            </span>
-            <div className="h-px w-10" style={{ background: 'var(--gold)' }} />
-          </div>
+          <span className="eyebrow eyebrow-on-dark">Rakamlarla Güvenay</span>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ delay: i * 0.12, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="text-center relative group"
+              viewport={{ once: true, margin: '-30px' }}
+              transition={{ delay: i * 0.1, duration: 0.7, ease: 'easeOut' }}
+              className="py-6 lg:py-2 lg:px-8 first:pl-0 border-t lg:border-t-0 lg:border-l first:border-0"
+              style={{ borderColor: 'var(--border-on-dark)' }}
             >
-              {/* Separator */}
-              {i < stats.length - 1 && (
-                <div
-                  className="absolute right-0 top-1/2 -translate-y-1/2 h-16 w-px hidden lg:block"
-                  style={{ background: 'rgba(200,169,110,0.1)' }}
-                />
-              )}
-
-              {/* Number */}
-              <div
-                className="text-5xl lg:text-6xl font-black mb-2 gradient-text"
-                style={{ fontFamily: 'Montserrat, sans-serif' }}
-              >
+              <div className="font-display text-5xl lg:text-6xl font-black mb-3 text-white">
                 <CountUp target={stat.value} suffix={stat.suffix} />
               </div>
-
-              {/* Label */}
-              <div
-                className="text-sm font-bold tracking-wider uppercase mb-1"
-                style={{ color: 'var(--warm-white)' }}
-              >
+              <div className="font-display text-sm lg:text-base font-bold uppercase tracking-[0.14em]" style={{ color: '#E8B08A' }}>
                 {stat.label}
               </div>
-
-              {/* Desc */}
-              <div className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>
-                {stat.desc}
-              </div>
-
-              {/* Hover bar */}
-              <div
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-0 group-hover:w-12 transition-all duration-500"
-                style={{ background: 'var(--gold)' }}
-              />
+              <div className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{stat.desc}</div>
             </motion.div>
           ))}
         </div>
       </div>
-
-      {/* Gold gradient bottom */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, var(--gold), transparent)' }}
-      />
     </section>
   )
 }
