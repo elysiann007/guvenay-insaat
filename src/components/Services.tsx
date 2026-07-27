@@ -80,7 +80,7 @@ export default function Services() {
             <motion.div
               key={s.title}
               variants={fadeUp}
-              className="group relative p-7 lg:p-9 border-b border-r flex flex-col transition-colors duration-300 hover:bg-white"
+              className="group relative z-0 p-7 lg:p-9 border-b border-r flex flex-col transition-all duration-300 hover:z-10 hover:bg-white hover:shadow-[0_28px_56px_-32px_rgba(22,21,18,0.28)] hover:-translate-y-0.5"
               style={{ borderColor: 'var(--border)' }}
             >
               {/* Accent line grows on hover */}
@@ -88,7 +88,12 @@ export default function Services() {
                 className="absolute top-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500"
                 style={{ background: 'var(--accent)' }}
               />
-              <s.icon size={26} strokeWidth={1.5} className="mb-6" style={{ color: 'var(--accent)' }} />
+              <div
+                className="w-12 h-12 flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
+                style={{ background: 'var(--accent-soft)' }}
+              >
+                <s.icon size={22} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+              </div>
               <h3 className="font-display text-lg lg:text-xl font-bold mb-2.5" style={{ color: 'var(--text)' }}>
                 {s.title}
               </h3>

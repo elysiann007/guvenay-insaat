@@ -84,7 +84,11 @@ export default function Contact() {
             transition={{ duration: 0.8, ease: 'easeOut' }}
             className="lg:col-span-7"
           >
-            <div className="p-7 lg:p-12 h-full" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+            <div
+              className="relative p-7 lg:p-12 h-full"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 32px 64px -40px rgba(22,21,18,0.22)' }}
+            >
+              <span className="absolute top-0 left-0 w-full h-[3px]" style={{ background: 'var(--accent)' }} aria-hidden="true" />
               {sent ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.97 }}

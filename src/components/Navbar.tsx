@@ -26,6 +26,14 @@ export default function Navbar() {
     return () => { document.body.style.overflow = '' }
   }, [open])
 
+  // Close mobile menu on Escape
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
+
   const handleNav = (href: string) => {
     setOpen(false)
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
@@ -45,6 +53,7 @@ export default function Navbar() {
           background: onDark ? 'transparent' : 'rgba(250,250,247,0.92)',
           backdropFilter: onDark ? 'none' : 'blur(12px)',
           borderBottom: onDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid var(--border)',
+          boxShadow: scrolled && !open ? '0 12px 28px -20px rgba(22,21,18,0.25)' : 'none',
         }}
       >
         <div className="max-w-7xl mx-auto px-5 lg:px-8">

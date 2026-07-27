@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { motion, useInView, useMotionValue, animate, useTransform } from 'framer-motion'
+import { motion, useInView, useMotionValue, animate, useTransform, useReducedMotion } from 'framer-motion'
 
 const stats = [
   { value: 30, suffix: '+', label: 'Yıl Deneyim', desc: "1994'ten bu yana sektördeyiz" },
@@ -11,6 +11,7 @@ const stats = [
 function CountUp({ target, suffix }: { target: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-50px' })
+  const prefersReduced = useReducedMotion()
   const count = useMotionValue(0)
   const rounded = useTransform(count, (v) =>
     target >= 1000
@@ -20,10 +21,14 @@ function CountUp({ target, suffix }: { target: number; suffix: string }) {
 
   useEffect(() => {
     if (isInView) {
+      if (prefersReduced) {
+        count.set(target)
+        return
+      }
       const controls = animate(count, target, { duration: 2.2, ease: [0, 0.5, 1, 1] })
       return controls.stop
     }
-  }, [isInView, count, target])
+  }, [isInView, count, target, prefersReduced])
 
   return (
     <span ref={ref}>

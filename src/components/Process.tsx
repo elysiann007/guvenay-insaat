@@ -55,11 +55,11 @@ export default function Process() {
             <motion.p variants={fadeUp} className="text-base lg:text-lg leading-relaxed mt-5" style={{ color: 'var(--text-soft)' }}>
               Şeffaf, sistematik ve müşteri odaklı sürecimizle her adımda yanınızdayız.
             </motion.p>
-            <motion.div variants={fadeUp} className="mt-10 hidden lg:block">
+            <motion.div variants={fadeUp} className="mt-10 hidden lg:block group overflow-hidden">
               <img
                 src="/media/process.webp"
                 alt="Mimari maket ve proje çizimleri"
-                className="w-full object-cover"
+                className="img-tone w-full object-cover"
                 style={{ aspectRatio: '4/3' }}
                 loading="lazy"
               />
@@ -78,7 +78,7 @@ export default function Process() {
               <motion.div
                 key={step.num}
                 variants={fadeUp}
-                className="group grid grid-cols-[auto_1fr] gap-6 lg:gap-10 py-7 lg:py-8 hairline-top last:hairline-bottom items-start"
+                className="group grid grid-cols-[auto_1fr] gap-6 lg:gap-10 py-7 lg:py-8 hairline-top last:hairline-bottom items-start transition-all duration-300 hover:pl-2"
               >
                 <span
                   className="font-display text-4xl lg:text-5xl font-black leading-none transition-colors duration-300 group-hover:text-[var(--accent)]"
@@ -87,7 +87,7 @@ export default function Process() {
                   {step.num}
                 </span>
                 <div>
-                  <h3 className="font-display text-xl lg:text-2xl font-bold" style={{ color: 'var(--text)' }}>
+                  <h3 className="font-display text-xl lg:text-2xl font-bold transition-colors duration-300 group-hover:text-[var(--accent)]" style={{ color: 'var(--text)' }}>
                     {step.title}
                   </h3>
                   <p className="text-sm lg:text-base leading-relaxed mt-2 max-w-lg" style={{ color: 'var(--text-soft)' }}>

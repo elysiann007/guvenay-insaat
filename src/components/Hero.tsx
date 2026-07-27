@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import { ArrowRight, ArrowDown } from 'lucide-react'
 
 const fadeUp = {
@@ -19,20 +20,46 @@ const stats = [
 
 export default function Hero() {
   const go = (href: string) => document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+  const sectionRef = useRef<HTMLElement>(null)
+  const reduceMotion = useReducedMotion()
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
+  const videoScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1, 1.18])
+
+  // The background video is only 720p — blown up to fill a tall phone screen it looks
+  // soft and badly cropped. On phones/tablets we show the sharp 2048px poster image
+  // instead, and only load/play the video on desktop where it fits the 16:9 frame.
+  const [isDesktop, setIsDesktop] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const update = () => setIsDesktop(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
 
   return (
-    <section id="hero" className="relative min-h-svh flex flex-col overflow-hidden" style={{ background: 'var(--ink)' }}>
-      {/* Background video */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/media/hero.mp4"
-        poster="/media/hero-poster.webp"
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden="true"
-      />
+    <section id="hero" ref={sectionRef} className="relative min-h-svh flex flex-col overflow-hidden" style={{ background: 'var(--ink)' }}>
+      {/* Background: sharp poster image on mobile, parallax video on desktop */}
+      {isDesktop ? (
+        <motion.video
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ scale: videoScale }}
+          src="/media/hero.mp4"
+          poster="/media/hero-poster.webp"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+        />
+      ) : (
+        <img
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          src="/media/hero-poster.webp"
+          alt=""
+          aria-hidden="true"
+        />
+      )}
       {/* Readability scrim */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -126,7 +153,10 @@ export default function Hero() {
         style={{ border: '1px solid rgba(255,255,255,0.35)', color: '#fff' }}
         aria-label="Aşağı kaydır"
       >
-        <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
+        <motion.span
+          animate={reduceMotion ? undefined : { y: [0, 4, 0] }}
+          transition={reduceMotion ? undefined : { duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        >
           <ArrowDown size={16} />
         </motion.span>
       </motion.button>

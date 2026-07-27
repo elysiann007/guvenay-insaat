@@ -41,13 +41,15 @@ export default function About() {
             transition={{ duration: 0.9, ease: 'easeOut' }}
             className="img-frame relative z-0 max-w-md lg:max-w-none mx-auto w-full"
           >
-            <img
-              src="/media/about.webp"
-              alt="Güvenay İnşaat mühendisleri şantiyede proje çizimlerini inceliyor"
-              className="w-full object-cover"
-              style={{ aspectRatio: '3/4' }}
-              loading="lazy"
-            />
+            <div className="relative overflow-hidden group">
+              <img
+                src="/media/about.webp"
+                alt="Güvenay İnşaat mühendisleri şantiyede proje çizimlerini inceliyor"
+                className="img-tone w-full object-cover"
+                style={{ aspectRatio: '3/4' }}
+                loading="lazy"
+              />
+            </div>
           </motion.div>
 
           {/* Text column */}
@@ -75,8 +77,8 @@ export default function About() {
             {/* Values as hairline-separated rows */}
             <div className="mt-10">
               {values.map((v) => (
-                <motion.div key={v.label} variants={fadeUp} className="flex items-start gap-5 py-5 hairline-top last:hairline-bottom">
-                  <v.icon size={20} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+                <motion.div key={v.label} variants={fadeUp} className="group flex items-start gap-5 py-5 hairline-top last:hairline-bottom transition-all duration-300 hover:pl-2">
+                  <v.icon size={20} className="shrink-0 mt-0.5 transition-transform duration-300 group-hover:scale-110" style={{ color: 'var(--accent)' }} />
                   <div>
                     <h3 className="font-display text-base lg:text-lg font-bold" style={{ color: 'var(--text)' }}>{v.label}</h3>
                     <p className="text-sm leading-relaxed mt-1" style={{ color: 'var(--text-soft)' }}>{v.desc}</p>

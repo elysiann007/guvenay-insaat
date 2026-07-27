@@ -47,6 +47,15 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 /* === TYPOGRAPHY === */
@@ -149,7 +158,7 @@
   transition: border-color 0.3s;
 }
 .input-line::placeholder { color: var(--text-dim); }
-.input-line:focus { border-bottom-color: var(--accent); }
+.input-line:focus { border-bottom-color: var(--accent); box-shadow: 0 1px 0 0 var(--accent); }
 
 /* === LINKS === */
 .link-underline {
@@ -193,4 +202,23 @@
   border: 1px solid var(--accent);
   pointer-events: none;
   z-index: -1;
+}
+
+/* === IMAGE TREATMENT — muted grayscale that blooms to full color on hover === */
+.img-tone {
+  filter: grayscale(55%) contrast(1.04) brightness(0.97);
+  transform: scale(1);
+  transition: filter 0.7s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.group:hover .img-tone,
+.group:focus-within .img-tone {
+  filter: grayscale(0%) contrast(1) brightness(1);
+  transform: scale(1.06);
+}
+
+/* === CARD SURFACE — subtle lift on hover, editorial (no rounding) === */
+.card-lift { transition: box-shadow 0.4s ease, transform 0.4s ease, border-color 0.4s ease; }
+.card-lift:hover {
+  box-shadow: 0 24px 48px -28px rgba(22, 21, 18, 0.22);
+  transform: translateY(-3px);
 }
