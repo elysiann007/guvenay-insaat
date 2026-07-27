@@ -19,9 +19,9 @@ const milestones = [
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' as const } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
 }
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }
+const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.04 } } }
 
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -41,13 +41,15 @@ export default function About() {
             transition={{ duration: 0.9, ease: 'easeOut' }}
             className="img-frame relative z-0 max-w-md lg:max-w-none mx-auto w-full"
           >
-            <img
-              src="/media/about.webp"
-              alt="Güvenay İnşaat mühendisleri şantiyede proje çizimlerini inceliyor"
-              className="w-full object-cover"
-              style={{ aspectRatio: '3/4' }}
-              loading="lazy"
-            />
+            <div className="relative overflow-hidden group">
+              <img
+                src="/media/about.webp"
+                alt="Güvenay İnşaat mühendisleri şantiyede proje çizimlerini inceliyor"
+                className="img-tone w-full object-cover"
+                style={{ aspectRatio: '3/4' }}
+                loading="lazy"
+              />
+            </div>
           </motion.div>
 
           {/* Text column */}
@@ -62,7 +64,7 @@ export default function About() {
             </motion.div>
             <motion.h2
               variants={fadeUp}
-              className="font-display text-4xl lg:text-5xl font-black tracking-tight mt-5 leading-[1.05]"
+              className="font-display text-h2 font-extrabold mt-5"
               style={{ color: 'var(--text)' }}
             >
               Türkiye'nin Güvenilir İnşaat Ortağı
@@ -75,10 +77,10 @@ export default function About() {
             {/* Values as hairline-separated rows */}
             <div className="mt-10">
               {values.map((v) => (
-                <motion.div key={v.label} variants={fadeUp} className="flex items-start gap-5 py-5 hairline-top last:hairline-bottom">
-                  <v.icon size={20} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+                <motion.div key={v.label} variants={fadeUp} className="group flex items-start gap-5 py-5 hairline-top last:hairline-bottom transition-all duration-300 hover:pl-2">
+                  <v.icon size={20} className="shrink-0 mt-0.5 transition-transform duration-300 group-hover:scale-110" style={{ color: 'var(--accent)' }} />
                   <div>
-                    <h3 className="font-display text-base lg:text-lg font-bold" style={{ color: 'var(--text)' }}>{v.label}</h3>
+                    <h3 className="font-display text-h3 font-bold" style={{ color: 'var(--text)' }}>{v.label}</h3>
                     <p className="text-sm leading-relaxed mt-1" style={{ color: 'var(--text-soft)' }}>{v.desc}</p>
                   </div>
                 </motion.div>
@@ -116,7 +118,7 @@ export default function About() {
                   />
                   <div>
                     <div className="flex items-baseline gap-4">
-                      <span className="font-display text-lg font-black" style={{ color: 'var(--accent)' }}>{m.year}</span>
+                      <span className="font-display text-lg font-black" style={{ color: 'var(--accent-strong)' }}>{m.year}</span>
                       <span className="font-display font-bold text-base lg:text-lg" style={{ color: 'var(--text)' }}>{m.title}</span>
                     </div>
                     <p className="text-sm leading-relaxed mt-1" style={{ color: 'var(--text-soft)' }}>{m.desc}</p>

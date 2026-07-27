@@ -1,28 +1,124 @@
 @import "tailwindcss";
 
+/*
+ * === TOKEN LAYER ===================================================
+ * Canonical values live on the legacy custom-property names (--bg,
+ * --text, --accent, ...) so every existing component that reads
+ * `var(--foo)` inline keeps working untouched. The @theme block below
+ * simply re-exports the same live variables under Tailwind's `--color-*`
+ * / `--text-*` namespaces so new work can use real utilities
+ * (`bg-surface`, `text-dim`, `text-h1`, ...) instead of inline styles.
+ *
+ * Theming contract:
+ *   1. Dark values apply by default via `prefers-color-scheme: dark`.
+ *   2. An explicit `data-theme="dark"` / `data-theme="light"` on the
+ *      root element always wins over the media query, in both
+ *      directions (Phase 2 ships the toggle that sets this attribute).
+ * ===================================================================
+ */
+
 @layer base {
   :root {
-    /* === SURFACES — light architectural === */
-    --bg: #FAFAF7;          /* warm off-white, page base */
-    --bg-alt: #F2F1EC;      /* section band */
-    --surface: #FFFFFF;     /* card / panel */
-    --ink: #161512;         /* dark contrast band (hero scrim, stats, footer) */
-    --ink-soft: #23211C;    /* lifted dark panel */
+    /* === SURFACES — light === */
+    --bg: #F8FAFC;          /* page base */
+    --bg-alt: #EBF0F5;      /* alternating section band */
+    --surface: #FFFFFF;     /* cards */
+    --ink: #0F172A;         /* always-dark contrast band (footer, stats, hero scrim) */
+    --ink-soft: #1E293B;    /* lifted dark panel, on-ink cards */
 
-    /* === TEXT === */
-    --text: #1C1B18;        /* headings / primary */
-    --text-soft: #5C5A52;   /* body copy */
-    --text-dim: #96938A;    /* captions / muted */
+    /* === TEXT — light === */
+    --text: #0F172A;        /* headings — 17.06 on bg */
+    --text-soft: #334155;   /* body — 9.90 on bg */
+    --text-dim: #64748B;    /* captions — 4.55 on bg (AA floor; do not lighten) */
 
-    /* === ACCENT — copper === */
-    --accent: #B4501E;
-    --accent-dark: #8F3E15;
-    --accent-soft: rgba(180, 80, 30, 0.08);
+    /* === ACCENT — light. Two roles, never collapse them:
+       --accent large display type (>=24px bold) / icons / rules / focus rings only.
+       --accent-strong any filled control carrying white text + accent body text. === */
+    --accent: #EA580C;
+    --accent-strong: #C2410C;
+    --accent-dark: #C2410C;  /* legacy alias, kept in sync with --accent-strong */
+    --accent-soft: rgba(234, 88, 18, 0.08); /* decorative tint only, never text */
 
-    /* === LINES === */
-    --border: rgba(28, 27, 24, 0.10);
-    --border-strong: rgba(28, 27, 24, 0.22);
-    --border-on-dark: rgba(255, 255, 255, 0.14);
+    /* === LINES — light ===
+       --border-strong is intentionally equal to --border-control: every
+       existing component treats it as a *meaningful* boundary (button
+       outlines, card rings, active-state borders), so it must clear the
+       same 3:1 UI-component floor as real form controls. */
+    --border: #E2E8F0;              /* decorative dividers only — 1.28, do not use for boundaries */
+    --border-control: #64748B;      /* form/control boundaries — 4.55, meets 1.4.11 */
+    --border-strong: var(--border-control);
+    --border-on-dark: rgba(255, 255, 255, 0.14); /* hairlines on always-dark --ink surfaces */
+  }
+
+  /* Dark tonal variants (not inversions) — default via OS preference */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0B1220;
+      --bg-alt: #111A2B;
+      --surface: #151E2E;
+      --ink: #05080F;          /* deeper than --bg so ink bands still read as a band */
+      --ink-soft: #121B2E;
+
+      --text: #F1F5F9;         /* headings — 17.09 */
+      --text-soft: #CBD5E1;    /* body — 12.61 */
+      --text-dim: #94A3B8;     /* captions — 7.30 */
+
+      --accent: #FB923C;       /* lightened for dark — 8.27, also usable as text here */
+      --accent-strong: #EA580C; /* 5.26 on dark surfaces */
+      --accent-dark: #EA580C;
+      --accent-soft: rgba(251, 146, 60, 0.10);
+
+      --border-control: #5A6B80; /* 3.43 on bg, 3.06 on surface */
+      --border-strong: var(--border-control);
+      /* --border and --border-on-dark are intentionally not redefined here:
+         --border stays decorative-only and is never load-bearing for
+         contrast; --border-on-dark is a fixed translucent white meant for
+         the always-dark --ink surfaces in either theme. */
+      --border: #1E293B;
+    }
+  }
+
+  /* Explicit override always wins over the media query, both directions */
+  :root[data-theme="dark"] {
+    --bg: #0B1220;
+    --bg-alt: #111A2B;
+    --surface: #151E2E;
+    --ink: #05080F;
+    --ink-soft: #121B2E;
+
+    --text: #F1F5F9;
+    --text-soft: #CBD5E1;
+    --text-dim: #94A3B8;
+
+    --accent: #FB923C;
+    --accent-strong: #EA580C;
+    --accent-dark: #EA580C;
+    --accent-soft: rgba(251, 146, 60, 0.10);
+
+    --border: #1E293B;
+    --border-control: #5A6B80;
+    --border-strong: var(--border-control);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #F8FAFC;
+    --bg-alt: #EBF0F5;
+    --surface: #FFFFFF;
+    --ink: #0F172A;
+    --ink-soft: #1E293B;
+
+    --text: #0F172A;
+    --text-soft: #334155;
+    --text-dim: #64748B;
+
+    --accent: #EA580C;
+    --accent-strong: #C2410C;
+    --accent-dark: #C2410C;
+    --accent-soft: rgba(234, 88, 18, 0.08);
+
+    --border: #E2E8F0;
+    --border-control: #64748B;
+    --border-strong: var(--border-control);
   }
 
   * { box-sizing: border-box; }
@@ -32,165 +128,267 @@
   body {
     background-color: var(--bg);
     color: var(--text);
-    font-family: 'Roboto Flex', system-ui, sans-serif;
+    font-family: 'Source Sans 3', system-ui, sans-serif;
     overflow-x: hidden;
     margin: 0;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  ::selection { background-color: var(--accent); color: #fff; }
+  /* Selection uses --accent-strong, not --accent: selected text renders
+     white-on-fill, and #EA580C fails AA for that (3.56) — see token notes. */
+  ::selection { background-color: var(--accent-strong); color: #fff; }
 
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: #C9C6BD; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-/* === TYPOGRAPHY === */
-.font-display {
-  font-family: 'Roboto Flex', system-ui, sans-serif;
-  font-variation-settings: 'wdth' 125, 'opsz' 144;
-  letter-spacing: -0.02em;
+/*
+ * === TAILWIND v4 THEME — real utilities over the same live variables ===
+ * These are aliases (var(--x)), not copies: because CSS custom properties
+ * resolve at used-value time, every utility generated from this block
+ * (bg-surface, text-dim, border-border-control, ...) tracks the current
+ * theme automatically, in light, dark, and the data-theme override.
+ */
+@theme {
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+
+  --color-text: var(--text);
+  --color-soft: var(--text-soft);
+  --color-dim: var(--text-dim);
+
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-control: var(--border-control);
+  --color-border-on-dark: var(--border-on-dark);
+
+  /* Body/UI font — Lexend headings stay opt-in via .font-display */
+  --font-sans: 'Source Sans 3', system-ui, sans-serif;
+
+  /* Fluid type scale (REDESIGN-PLAN.md §2). h1 is capped at 7.5rem, not
+     12rem — 12rem overflows Turkish compound headings at 375px. */
+  --text-h1: clamp(2.75rem, 9vw, 7.5rem);
+  --text-h1--line-height: 0.95;
+  --text-h1--letter-spacing: -0.04em;
+  --text-h1--font-weight: 900;
+
+  --text-h2: clamp(2rem, 4.5vw, 3.5rem);
+  --text-h2--line-height: 1.05;
+  --text-h2--letter-spacing: -0.03em;
+  --text-h2--font-weight: 800;
+
+  --text-h3: clamp(1.25rem, 2vw, 1.5rem);
+  --text-h3--line-height: 1.25;
+  --text-h3--font-weight: 700;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+
+  --text-eyebrow: 0.72rem;
+  --text-eyebrow--letter-spacing: 0.22em;
+  --text-eyebrow--font-weight: 700;
 }
 
-/* Small uppercase tracked label */
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-.eyebrow::before {
-  content: '';
-  width: 2rem;
-  height: 1px;
-  background: var(--accent);
-}
-.eyebrow-on-dark { color: #E8B08A; }
-.eyebrow-on-dark::before { background: #E8B08A; }
+/*
+ * === COMPONENT-LEVEL CLASSES ===
+ * Kept in @layer components (Tailwind default order: theme < base <
+ * components < utilities) so a future utility class (e.g. the text-h1
+ * clamp above) can still override a property here when combined on the
+ * same element, instead of losing to an unlayered rule unconditionally.
+ */
+@layer components {
+  /* === TYPOGRAPHY === */
+  .font-display {
+    font-family: 'Lexend', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
 
-/* === BUTTONS — rectangular, editorial === */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  background: var(--ink);
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
-  padding: 0.95rem 2rem;
-  border-radius: 2px;
-  border: 1px solid var(--ink);
-  cursor: pointer;
-  transition: background 0.3s, border-color 0.3s, transform 0.25s;
-}
-.btn-primary:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-1px); }
-.btn-primary:active { transform: translateY(0); }
+  /* Small uppercase tracked label.
+     Text uses --accent-strong, not --accent: at 0.72rem this is normal-size
+     text, and #EA580C fails AA normal-text contrast (3.40) — see §0. The
+     hairline rule stays --accent since rules only need the 3:1 UI floor. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+  }
+  .eyebrow::before {
+    content: '';
+    width: 2rem;
+    height: 1px;
+    background: var(--accent);
+  }
+  .eyebrow-on-dark { color: #FB923C; }
+  .eyebrow-on-dark::before { background: #FB923C; }
 
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  background: transparent;
-  color: var(--text);
-  font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
-  padding: 0.95rem 2rem;
-  border-radius: 2px;
-  border: 1px solid var(--border-strong);
-  cursor: pointer;
-  transition: border-color 0.3s, color 0.3s, transform 0.25s;
-}
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  /* === BUTTONS === */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    background: var(--ink);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    padding: 0.95rem 2rem;
+    border-radius: 2px;
+    border: 1px solid var(--ink);
+    cursor: pointer;
+    transition: background 0.2s ease-out, border-color 0.2s ease-out, transform 0.2s ease-out;
+  }
+  /* Hover fill is --accent-strong, not --accent: this is a filled control
+     with a white label, and #EA580C fails AA for that pairing (3.56). */
+  .btn-primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
 
-/* White-outline variant for use on dark imagery */
-.btn-on-dark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
-  padding: 0.95rem 2rem;
-  border-radius: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-  transition: background 0.3s, border-color 0.3s, transform 0.25s;
-}
-.btn-on-dark:hover { background: rgba(255, 255, 255, 0.14); border-color: #fff; transform: translateY(-1px); }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    background: transparent;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    padding: 0.95rem 2rem;
+    border-radius: 2px;
+    border: 1px solid var(--border-strong);
+    cursor: pointer;
+    transition: border-color 0.2s ease-out, color 0.2s ease-out, transform 0.2s ease-out;
+  }
+  /* Hover label uses --accent-strong (small text); border may use --accent
+     since a border is a non-text rule. */
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent-strong); transform: translateY(-1px); }
 
-/* === INPUTS — underline only === */
-.input-line {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border-strong);
-  border-radius: 0;
-  color: var(--text);
-  font-family: 'Roboto Flex', sans-serif;
-  font-size: 0.95rem;
-  padding: 0.75rem 0;
-  outline: none;
-  transition: border-color 0.3s;
-}
-.input-line::placeholder { color: var(--text-dim); }
-.input-line:focus { border-bottom-color: var(--accent); }
+  /* White-outline variant for use on dark imagery */
+  .btn-on-dark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    padding: 0.95rem 2rem;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s ease-out, border-color 0.2s ease-out, transform 0.2s ease-out;
+  }
+  .btn-on-dark:hover { background: rgba(255, 255, 255, 0.14); border-color: #fff; transform: translateY(-1px); }
 
-/* === LINKS === */
-.link-underline {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-weight: 600;
-  color: var(--text);
-  cursor: pointer;
-  transition: color 0.25s;
-}
-.link-underline::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -3px;
-  width: 100%;
-  height: 1px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-}
-.link-underline:hover { color: var(--accent); }
-.link-underline:hover::after { transform: scaleX(1); }
+  /* === INPUTS — underline only. Boundary is --border-control, never the
+     decorative --border, per the non-negotiable rule. === */
+  .input-line {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border-control);
+    border-radius: 0;
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.95rem;
+    padding: 0.75rem 0;
+    outline: none;
+    transition: border-color 0.2s ease-out;
+  }
+  .input-line::placeholder { color: var(--text-dim); }
+  .input-line:focus { border-bottom-color: var(--accent); box-shadow: 0 1px 0 0 var(--accent); }
 
-/* === RULES === */
-.hairline-top { border-top: 1px solid var(--border); }
-.hairline-bottom { border-bottom: 1px solid var(--border); }
+  /* === LINKS === */
+  .link-underline {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: color 0.2s ease-out;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease-out;
+  }
+  /* --accent-strong, not --accent: this recolors normal-size link text. */
+  .link-underline:hover { color: var(--accent-strong); }
+  .link-underline:hover::after { transform: scaleX(1); }
 
-/* === IMAGE FRAME — offset accent frame for editorial photos === */
-.img-frame { position: relative; }
-.img-frame::after {
-  content: '';
-  position: absolute;
-  top: 1.25rem;
-  left: 1.25rem;
-  right: -1.25rem;
-  bottom: -1.25rem;
-  border: 1px solid var(--accent);
-  pointer-events: none;
-  z-index: -1;
+  /* === RULES === */
+  .hairline-top { border-top: 1px solid var(--border); }
+  .hairline-bottom { border-bottom: 1px solid var(--border); }
+
+  /* === IMAGE FRAME — offset accent frame for editorial photos === */
+  .img-frame { position: relative; }
+  .img-frame::after {
+    content: '';
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
+    right: -1.25rem;
+    bottom: -1.25rem;
+    border: 1px solid var(--accent);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* === IMAGE TREATMENT — muted grayscale that blooms to full color on hover === */
+  .img-tone {
+    filter: grayscale(55%) contrast(1.04) brightness(0.97);
+    transform: scale(1);
+    transition: filter 0.4s ease-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .group:hover .img-tone,
+  .group:focus-within .img-tone {
+    filter: grayscale(0%) contrast(1) brightness(1);
+    transform: scale(1.06);
+  }
+
+  /* === CARD SURFACE — subtle lift on hover, editorial (no rounding) === */
+  .card-lift { transition: box-shadow 0.25s ease-out, transform 0.25s ease-out, border-color 0.25s ease-out; }
+  .card-lift:hover {
+    box-shadow: 0 24px 48px -28px rgba(5, 8, 15, 0.22);
+    transform: translateY(-3px);
+  }
 }

@@ -2,9 +2,26 @@
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // No-flash theme bootstrap: must run synchronously, before first
+      // paint, so a saved explicit choice doesn't flash the wrong theme
+      // while the app hydrates. Mirrors src/hooks/useTheme.ts — same
+      // localStorage key, same values. 'system' (or nothing stored)
+      // intentionally sets no attribute, leaving prefers-color-scheme in
+      // src/index.css in control.
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          if (stored === 'light' || stored === 'dark') {
+            document.documentElement.setAttribute('data-theme', stored);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#FAFAF7" />
+    <meta name="theme-color" content="#F8FAFC" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)" />
     <title>Güvenay İnşaat – Geleceği İnşa Ediyoruz</title>
     <meta name="description" content="30 yılı aşkın deneyimle konut, ticari ve endüstriyel projeler. Güvenay İnşaat ile hayalinizdeki yapıya kavuşun." />
     <meta property="og:type" content="website" />
@@ -12,9 +29,14 @@
     <meta property="og:description" content="30 yılı aşkın deneyimle konut, ticari ve endüstriyel projeleri zamanında ve eksiksiz teslim ediyoruz." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <style>
-      html { background: #FAFAF7; }
+      html { background: #F8FAFC; }
+      @media (prefers-color-scheme: dark) {
+        html:not([data-theme="light"]) { background: #0B1220; }
+      }
+      html[data-theme="dark"] { background: #0B1220; }
+      html[data-theme="light"] { background: #F8FAFC; }
     </style>
   </head>
   <body>

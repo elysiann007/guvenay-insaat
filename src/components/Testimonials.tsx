@@ -81,52 +81,64 @@ export default function Testimonials() {
             "
           </span>
 
-          <AnimatePresence custom={direction} mode="wait">
-            <motion.div
-              key={current}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.45, ease: 'easeOut' }}
-              className="flex flex-col flex-1"
-            >
-              <blockquote className="font-display text-xl lg:text-3xl leading-relaxed lg:leading-snug font-medium flex-1" style={{ color: 'var(--text)' }}>
-                {t.text}
-              </blockquote>
+          {/* Slides animate x: ±40px. Without a clip here they push the document
+              20px past a 375px viewport, which also stretches the fixed navbar.
+              Clipping on this wrapper (not the parent) keeps the decorative
+              quote mark's negative offsets from being cut. */}
+          <div className="flex flex-col flex-1 overflow-x-clip">
+            <AnimatePresence custom={direction} mode="wait">
+              <motion.div
+                key={current}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+                className="flex flex-col flex-1"
+              >
+                <blockquote className="font-display text-xl lg:text-3xl leading-relaxed lg:leading-snug font-medium flex-1" style={{ color: 'var(--text)' }}>
+                  {t.text}
+                </blockquote>
 
-              <div className="flex items-center gap-4 mt-8 pt-6 hairline-top">
-                <div
-                  className="w-12 h-12 flex items-center justify-center text-sm font-extrabold shrink-0"
-                  style={{ background: 'var(--ink)', color: '#fff' }}
-                >
-                  {t.initials}
+                <div className="flex items-center gap-4 mt-8 pt-6 hairline-top">
+                  <div
+                    className="w-12 h-12 flex items-center justify-center text-sm font-extrabold shrink-0"
+                    style={{ background: 'var(--ink)', color: '#fff' }}
+                  >
+                    {t.initials}
+                  </div>
+                  <div>
+                    <div className="font-bold text-sm" style={{ color: 'var(--text)' }}>{t.name}</div>
+                    <div className="text-xs mt-0.5" style={{ color: 'var(--text-dim)' }}>{t.role}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-bold text-sm" style={{ color: 'var(--text)' }}>{t.name}</div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-dim)' }}>{t.role}</div>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Controls */}
         <div className="flex items-center justify-between mt-9">
-          <div className="flex gap-2.5">
+          <div className="flex">
             {testimonials.map((_, i) => (
               <button
                 key={i}
                 onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i) }}
-                className="cursor-pointer transition-all duration-300"
-                style={{
-                  width: i === current ? 28 : 12,
-                  height: 2,
-                  background: i === current ? 'var(--accent)' : 'var(--border-strong)',
-                }}
+                className="min-w-11 min-h-11 flex items-center justify-center cursor-pointer"
                 aria-label={`Yorum ${i + 1}`}
-              />
+                aria-pressed={i === current}
+              >
+                <span
+                  aria-hidden="true"
+                  className="block transition-all duration-300"
+                  style={{
+                    width: i === current ? 28 : 12,
+                    height: 2,
+                    background: i === current ? 'var(--accent)' : 'var(--border-strong)',
+                  }}
+                />
+              </button>
             ))}
           </div>
 

@@ -69,51 +69,70 @@ const projects = [
 
 const categories: Category[] = ['Tümü', 'Konut', 'Ticari', 'Endüstriyel']
 
-function ProjectCard({ project }: { project: typeof projects[0] }) {
+function ProjectCard({ project, featured, index }: { project: typeof projects[0]; featured: boolean; index: number }) {
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="group cursor-pointer"
+      transition={{ duration: 0.5, ease: 'easeOut', delay: Math.min(index, 4) * 0.05 }}
+      className={`group relative cursor-pointer overflow-hidden ${featured ? 'sm:col-span-2 lg:col-span-2 lg:row-span-2' : ''}`}
     >
-      {/* Image */}
-      <div className="relative overflow-hidden" style={{ aspectRatio: '4/3', background: 'var(--bg-alt)' }}>
+      {/* Image — grayscale blooms to color, gentle zoom, on hover/focus */}
+      <div
+        className="relative overflow-hidden w-full aspect-[4/3] lg:aspect-auto lg:h-full"
+        style={{ background: 'var(--bg-alt)', minHeight: featured ? 320 : 220 }}
+      >
         <img
           src={project.img}
           alt={project.alt}
           loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="img-tone absolute inset-0 w-full h-full object-cover"
         />
+
+        {/* Scrim for legible overlay caption — token-derived from --ink so it
+            tracks theme, rather than a hardcoded old-palette rgba */}
+        <div
+          className="absolute inset-0 transition-opacity duration-500 opacity-70 group-hover:opacity-90"
+          style={{
+            background:
+              'linear-gradient(to top, color-mix(in srgb, var(--ink) 88%, transparent) 0%, color-mix(in srgb, var(--ink) 25%, transparent) 45%, transparent 70%)',
+          }}
+        />
+
+        {/* Category badge */}
         <div
           className="absolute top-3 left-3 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em]"
-          style={{ background: 'rgba(250,250,247,0.92)', color: 'var(--text)' }}
+          style={{ background: 'color-mix(in srgb, var(--surface) 92%, transparent)', color: 'var(--text)' }}
         >
           {project.category}
         </div>
+
+        {/* Reveal arrow */}
         <div
-          className="absolute bottom-3 right-3 w-10 h-10 flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
+          className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
           style={{ background: 'var(--accent)', color: '#fff' }}
         >
           <ArrowUpRight size={16} />
         </div>
-      </div>
 
-      {/* Ruled caption row */}
-      <div className="pt-4 pb-5 hairline-bottom">
-        <div className="flex items-baseline justify-between gap-4">
-          <h3 className="font-display text-lg lg:text-xl font-bold leading-tight transition-colors duration-300 group-hover:text-[var(--accent)]" style={{ color: 'var(--text)' }}>
+        {/* Caption overlay — sits on the image, editorial gallery style */}
+        <div className="absolute inset-x-0 bottom-0 p-5 lg:p-6 translate-y-1.5 group-hover:translate-y-0 transition-transform duration-500">
+          <h3
+            className={`font-display font-bold leading-tight text-white ${featured ? 'text-2xl lg:text-3xl' : 'text-lg lg:text-xl'}`}
+          >
             {project.name}
           </h3>
-          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--accent)' }}>
-            {project.units}
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-xs" style={{ color: 'var(--text-dim)' }}>
-          <span className="flex items-center gap-1"><MapPin size={11} />{project.location}</span>
-          <span className="flex items-center gap-1"><Calendar size={11} />{project.year}</span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs" style={{ color: 'rgba(255,255,255,0.72)' }}>
+            <span className="flex items-center gap-1"><MapPin size={11} />{project.location}</span>
+            <span className="flex items-center gap-1"><Calendar size={11} />{project.year}</span>
+            {/* Same fixed on-dark accent as .eyebrow-on-dark (index.css): this
+                sits on a dark photo scrim in both themes, so the theme-swapping
+                --accent-strong (a *darker* orange in light mode) would fail
+                contrast here — see Stats.tsx for the identical reasoning. */}
+            <span className="font-bold" style={{ color: '#FB923C' }}>{project.units}</span>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -148,7 +167,8 @@ export default function Projects() {
               <button
                 key={cat}
                 onClick={() => setActive(cat)}
-                className="relative shrink-0 pb-2 text-sm font-bold uppercase tracking-[0.1em] cursor-pointer transition-colors duration-300"
+                aria-pressed={active === cat}
+                className="relative shrink-0 min-h-11 flex items-end pb-2 text-sm font-bold uppercase tracking-[0.1em] cursor-pointer transition-colors duration-300"
                 style={{ color: active === cat ? 'var(--text)' : 'var(--text-dim)' }}
               >
                 {cat}
@@ -161,30 +181,19 @@ export default function Projects() {
           </div>
         </motion.div>
 
-        {/* Grid */}
+        {/* Grid — editorial, dense-packed with a large featured tile */}
         <LayoutGroup>
-          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+          <motion.div
+            layout
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:auto-rows-[240px] lg:grid-flow-dense gap-4 lg:gap-5"
+          >
             <AnimatePresence mode="popLayout">
-              {filtered.map((p) => (
-                <ProjectCard key={p.id} project={p} />
+              {filtered.map((p, i) => (
+                <ProjectCard key={p.id} project={p} featured={i === 0} index={i} />
               ))}
             </AnimatePresence>
           </motion.div>
         </LayoutGroup>
-
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mt-14"
-        >
-          <button className="btn-secondary">
-            Tüm Projeleri Gör
-            <ArrowUpRight size={16} />
-          </button>
-        </motion.div>
       </div>
     </section>
   )

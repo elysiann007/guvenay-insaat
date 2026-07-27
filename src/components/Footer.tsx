@@ -13,42 +13,49 @@ const socials = [
   { label: 'YouTube', path: 'M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58zM9.75 15.02V8.98L15.5 12z' },
 ]
 
+// Footer sits on --ink, an always-dark surface in both themes, so on-dark
+// content conventions apply (see .eyebrow-on-dark / --border-on-dark in
+// src/index.css) rather than the light/dark --text tokens.
 export default function Footer() {
   return (
-    <footer style={{ background: 'var(--ink)' }}>
+    <footer className="bg-[var(--ink)]">
       <div className="max-w-7xl mx-auto px-5 lg:px-8">
         {/* Main */}
         <div className="py-14 lg:py-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-9 h-9 flex items-center justify-center text-sm font-black font-display" style={{ background: '#fff', color: 'var(--ink)' }}>
+              <div className="w-9 h-9 flex items-center justify-center text-sm font-black font-display bg-white text-[var(--ink)]">
                 Gİ
               </div>
               <span className="text-lg font-extrabold text-white font-display tracking-tight">
                 Güvenay İnşaat
               </span>
             </div>
-            <p className="text-sm leading-relaxed mb-7 max-w-xs" style={{ color: 'rgba(255,255,255,0.55)' }}>
+            <p className="text-sm leading-relaxed mb-7 max-w-xs text-white/55">
               1994'ten bu yana Türkiye'nin dört bir yanında kalıcı yapılar inşa ediyoruz.
             </p>
-            <div className="flex flex-col gap-3">
-              {[
-                { icon: Phone, text: '+90 (212) 555 0100', href: 'tel:+902125550100' },
-                { icon: Mail, text: 'info@guvenayinsaat.com.tr', href: 'mailto:info@guvenayinsaat.com.tr' },
-                { icon: MapPin, text: 'Maslak, İstanbul', href: undefined },
-              ].map((c) => (
-                <a
-                  key={c.text}
-                  href={c.href}
-                  className="flex items-center gap-2.5 text-sm transition-colors hover:text-white"
-                  style={{ color: 'rgba(255,255,255,0.65)' }}
-                >
-                  <c.icon size={14} style={{ color: '#E8B08A', flexShrink: 0 }} />
-                  {c.text}
-                </a>
-              ))}
-            </div>
+
+            <address className="flex flex-col gap-3 not-italic">
+              <a
+                href="tel:+902125550100"
+                className="flex items-center gap-2.5 text-sm text-white/65 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
+              >
+                <Phone size={14} className="shrink-0 text-[var(--accent)]" />
+                +90 (212) 555 0100
+              </a>
+              <a
+                href="mailto:info@guvenayinsaat.com.tr"
+                className="flex items-center gap-2.5 text-sm text-white/65 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
+              >
+                <Mail size={14} className="shrink-0 text-[var(--accent)]" />
+                info@guvenayinsaat.com.tr
+              </a>
+              <span className="flex items-center gap-2.5 text-sm text-white/65">
+                <MapPin size={14} className="shrink-0 text-[var(--accent)]" />
+                Maslak, İstanbul
+              </span>
+            </address>
 
             {/* Socials */}
             <div className="flex items-center gap-2.5 mt-8">
@@ -57,8 +64,7 @@ export default function Footer() {
                   key={s.label}
                   href="#"
                   aria-label={s.label}
-                  className="w-10 h-10 flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5"
-                  style={{ border: '1px solid var(--border-on-dark)', color: 'rgba(255,255,255,0.7)' }}
+                  className="w-11 h-11 flex items-center justify-center border border-[var(--border-on-dark)] text-white/70 rounded-sm transition-all duration-300 hover:-translate-y-0.5 hover:text-white hover:border-white/40 focus-visible:-translate-y-0.5 focus-visible:text-white"
                 >
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                     <path d={s.path} />
@@ -71,16 +77,13 @@ export default function Footer() {
           {/* Links */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4 className="text-[11px] font-bold uppercase tracking-[0.22em] mb-6" style={{ color: '#E8B08A' }}>
-                {title}
-              </h4>
+              <h4 className="eyebrow eyebrow-on-dark mb-6">{title}</h4>
               <ul className="flex flex-col gap-3">
                 {links.map((link) => (
                   <li key={link}>
                     <a
                       href="#"
-                      className="text-sm transition-colors duration-200 hover:text-white"
-                      style={{ color: 'rgba(255,255,255,0.55)' }}
+                      className="text-sm text-white/55 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
                     >
                       {link}
                     </a>
@@ -92,25 +95,23 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div
-          className="py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left"
-          style={{ borderTop: '1px solid var(--border-on-dark)' }}
-        >
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+        <div className="py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left border-t border-[var(--border-on-dark)]">
+          <p className="text-xs text-white/55">
             © 2024 Güvenay İnşaat. Tüm hakları saklıdır.
           </p>
-          <div className="flex items-center gap-5 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            <a href="#" className="transition-colors hover:text-white" style={{ color: 'inherit' }}>Gizlilik</a>
-            <a href="#" className="transition-colors hover:text-white" style={{ color: 'inherit' }}>Kullanım Koşulları</a>
+          <div className="flex items-center gap-5 text-xs text-white/55">
+            <a href="#" className="rounded-sm transition-colors hover:text-white focus-visible:text-white">Gizlilik</a>
+            <a href="#" className="rounded-sm transition-colors hover:text-white focus-visible:text-white">Kullanım Koşulları</a>
           </div>
         </div>
       </div>
 
-      {/* Back to top */}
+      {/* Back to top — accent-strong fill, not accent: a filled control
+          carrying a white icon, same rule as any filled control with
+          white content (see REDESIGN-PLAN.md §0). */}
       <button
         onClick={() => document.querySelector('#hero')?.scrollIntoView({ behavior: 'smooth' })}
-        className="fixed bottom-5 right-5 w-12 h-12 flex items-center justify-center z-40 cursor-pointer transition-transform duration-300 hover:-translate-y-1"
-        style={{ background: 'var(--accent)', color: '#fff' }}
+        className="fixed bottom-5 right-5 w-12 h-12 flex items-center justify-center z-40 cursor-pointer bg-[var(--accent-strong)] text-white rounded-sm transition-transform duration-300 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
         aria-label="Yukarı çık"
       >
         <ArrowUp size={18} />

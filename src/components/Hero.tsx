@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import { ArrowRight, ArrowDown } from 'lucide-react'
 
 const fadeUp = {
@@ -6,39 +7,58 @@ const fadeUp = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.2 + i * 0.12, duration: 0.8, ease: 'easeOut' as const },
+    transition: { delay: 0.2 + i * 0.04, duration: 0.4, ease: 'easeOut' as const },
   }),
 }
 
-const stats = [
-  { n: '30+', label: 'Yıl Deneyim' },
-  { n: '500+', label: 'Tamamlanan Proje' },
-  { n: '50+', label: 'Aktif Şantiye' },
-  { n: '10K+', label: 'Mutlu Aile' },
-]
-
 export default function Hero() {
   const go = (href: string) => document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+  const sectionRef = useRef<HTMLElement>(null)
+  const reduceMotion = useReducedMotion()
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
+  const videoScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1, 1.18])
+
+  // The background video is only 720p — blown up to fill a tall phone screen it looks
+  // soft and badly cropped. On phones/tablets we show the sharp 2048px poster image
+  // instead, and only load/play the video on desktop where it fits the 16:9 frame.
+  const [isDesktop, setIsDesktop] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const update = () => setIsDesktop(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
 
   return (
-    <section id="hero" className="relative min-h-svh flex flex-col overflow-hidden" style={{ background: 'var(--ink)' }}>
-      {/* Background video */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/media/hero.mp4"
-        poster="/media/hero-poster.webp"
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden="true"
-      />
-      {/* Readability scrim */}
+    <section id="hero" ref={sectionRef} className="relative min-h-svh flex flex-col overflow-hidden" style={{ background: 'var(--ink)' }}>
+      {/* Background: sharp poster image on mobile, parallax video on desktop */}
+      {isDesktop ? (
+        <motion.video
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ scale: videoScale }}
+          src="/media/hero.mp4"
+          poster="/media/hero-poster.webp"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+        />
+      ) : (
+        <img
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          src="/media/hero-poster.webp"
+          alt=""
+          aria-hidden="true"
+        />
+      )}
+      {/* Readability scrim — tinted from --ink so it retones automatically per theme */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'linear-gradient(to top, rgba(22,21,18,0.88) 0%, rgba(22,21,18,0.35) 40%, rgba(22,21,18,0.15) 65%, rgba(22,21,18,0.45) 100%)',
+            'linear-gradient(to top, color-mix(in srgb, var(--ink) 88%, transparent) 0%, color-mix(in srgb, var(--ink) 35%, transparent) 40%, color-mix(in srgb, var(--ink) 15%, transparent) 65%, color-mix(in srgb, var(--ink) 45%, transparent) 100%)',
         }}
       />
 
@@ -53,7 +73,7 @@ export default function Hero() {
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="font-display text-5xl sm:text-7xl lg:text-[6.5rem] font-black leading-[0.98] tracking-tight mt-5 text-white max-w-4xl"
+          className="font-display text-h1 font-black text-white max-w-4xl mt-5"
         >
           Geleceği
           <br />
@@ -91,29 +111,6 @@ export default function Hero() {
             Ücretsiz Teklif Al
           </button>
         </motion.div>
-
-        {/* Stats strip along the bottom edge */}
-        <motion.div
-          custom={4}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-2 lg:grid-cols-4 mt-14 pt-7"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.22)' }}
-        >
-          {stats.map((s, i) => (
-            <div
-              key={s.label}
-              className="py-2 lg:py-0 lg:px-6 first:pl-0"
-              style={{ borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.14)' : 'none' }}
-            >
-              <div className="font-display text-3xl lg:text-4xl font-extrabold text-white">{s.n}</div>
-              <div className="text-[11px] uppercase tracking-[0.18em] font-semibold mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                {s.label}
-              </div>
-            </div>
-          ))}
-        </motion.div>
       </div>
 
       {/* Scroll hint */}
@@ -126,7 +123,10 @@ export default function Hero() {
         style={{ border: '1px solid rgba(255,255,255,0.35)', color: '#fff' }}
         aria-label="Aşağı kaydır"
       >
-        <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
+        <motion.span
+          animate={reduceMotion ? undefined : { y: [0, 4, 0] }}
+          transition={reduceMotion ? undefined : { duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        >
           <ArrowDown size={16} />
         </motion.span>
       </motion.button>
