@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react'
 import { motion, useInView, useMotionValue, animate, useTransform, useReducedMotion } from 'framer-motion'
-import { Award, Building2, MapPin, Users } from 'lucide-react'
+import { Award, Zap, TowerControl, Cable } from 'lucide-react'
+import RevealHeading from './RevealHeading'
+import { DURATION, EASE_OUT_EXPO, useFadeVariants, VIEWPORT_ONCE } from '../lib/motion'
 
 const stats = [
   { value: 30, suffix: '+', label: 'Yıl Deneyim', desc: "1994'ten bu yana sektördeyiz", icon: Award },
-  { value: 500, suffix: '+', label: 'Tamamlanan Proje', desc: 'Her biri bir başarı hikayesi', icon: Building2 },
-  { value: 50, suffix: '+', label: 'Aktif Şantiye', desc: "Türkiye'nin dört bir yanında", icon: MapPin },
-  { value: 10000, suffix: '+', label: 'Mutlu Aile', desc: 'Hayallerini gerçeğe dönüştürdük', icon: Users },
+  { value: 1250, suffix: '+', label: 'Km İletim Hattı', desc: 'Enerji nakil hatlarında tamamlanan uzunluk', icon: Zap },
+  { value: 85, suffix: '+', label: 'Trafo Merkezi & Saha', desc: "Türkiye'nin çeşitli bölgelerinde", icon: TowerControl },
+  { value: 3200, suffix: '+', label: 'Km Fiber Altyapı', desc: 'Telekom şebekesine döşenen fiber hat', icon: Cable },
 ]
 
 function CountUp({ target, suffix }: { target: number; suffix: string }) {
@@ -14,10 +16,16 @@ function CountUp({ target, suffix }: { target: number; suffix: string }) {
   const isInView = useInView(ref, { once: true, margin: '-50px' })
   const prefersReduced = useReducedMotion()
   const count = useMotionValue(0)
+  // Coarse rounding (nearest 100) only smooths digits *during* the
+  // animation so they don't jitter every frame. Once the value has
+  // actually reached the target, render the exact target — otherwise
+  // e.g. target 1250 would land on Math.round(1250/100)*100 = 1300.
   const rounded = useTransform(count, (v) =>
-    target >= 1000
-      ? (Math.round(v / 100) * 100).toLocaleString('tr-TR')
-      : Math.round(v).toString()
+    v >= target
+      ? target.toLocaleString('tr-TR')
+      : target >= 1000
+        ? (Math.round(v / 100) * 100).toLocaleString('tr-TR')
+        : Math.round(v).toLocaleString('tr-TR')
   )
 
   useEffect(() => {
@@ -26,7 +34,7 @@ function CountUp({ target, suffix }: { target: number; suffix: string }) {
         count.set(target)
         return
       }
-      const controls = animate(count, target, { duration: 2.2, ease: [0, 0.5, 1, 1] })
+      const controls = animate(count, target, { duration: 2.2, ease: EASE_OUT_EXPO })
       return controls.stop
     }
   }, [isInView, count, target, prefersReduced])
@@ -40,50 +48,56 @@ function CountUp({ target, suffix }: { target: number; suffix: string }) {
 }
 
 export default function Stats() {
+  const fade = useFadeVariants()
+  const reduceMotion = useReducedMotion()
   return (
     <section className="relative py-24 lg:py-32" style={{ background: 'var(--ink)' }}>
       <div className="max-w-7xl mx-auto px-5 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          viewport={VIEWPORT_ONCE}
+          transition={{ duration: reduceMotion ? 0 : DURATION.base, ease: EASE_OUT_EXPO }}
           className="mb-14 lg:mb-20 max-w-2xl"
         >
           <span className="eyebrow eyebrow-on-dark">Rakamlarla Güvenay</span>
-          <h2 className="font-display text-3xl lg:text-4xl font-black tracking-tight mt-5 leading-[1.05] text-white">
-            30 Yıldır Güvenle İnşa Ediyoruz
-          </h2>
+          <RevealHeading
+            as="h2"
+            lines={['30 Yıldır Güvenle Altyapı Kuruyoruz']}
+            className="font-display text-3xl lg:text-4xl font-black tracking-tight mt-5 leading-[1.05] text-white"
+          />
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, i) => (
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-30px' }}
+          variants={fade.stagger}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          {stats.map((stat) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-30px' }}
-              transition={{ delay: i * 0.04, duration: 0.4, ease: 'easeOut' }}
+              variants={fade.item}
               className="py-8 lg:py-2 lg:px-8 first:pl-0 border-t lg:border-t-0 lg:border-l first:border-0"
               style={{ borderColor: 'var(--border-on-dark)' }}
             >
-              <stat.icon size={22} strokeWidth={1.5} className="mb-4" style={{ color: 'var(--accent)' }} aria-hidden="true" />
+              {/* This band is always --ink — plain --accent measures 2.06 here
+                  (index.css §ACCENT), so the icon uses the verified on-dark gold. */}
+              <stat.icon size={22} strokeWidth={1.5} className="mb-4" style={{ color: 'var(--accent-on-dark)' }} aria-hidden="true" />
               <div className="font-display text-6xl lg:text-7xl font-black mb-3 text-white">
                 <CountUp target={stat.value} suffix={stat.suffix} />
               </div>
-              {/* Label sits on the always-dark --ink band (both themes render it
-                  dark), so it uses the same fixed light-orange the design system
-                  already reserves for that context — see .eyebrow-on-dark in
-                  index.css. --accent-strong would swap to a *darker* orange in
-                  light mode and fail contrast here, since --ink stays dark
-                  regardless of the active theme. */}
-              <div className="font-display text-sm lg:text-base font-bold uppercase tracking-[0.14em]" style={{ color: '#FB923C' }}>
+              {/* Label sits on the always-dark --ink band, so it uses
+                  --accent-on-dark (navy 6.20 / ink 10.69) rather than
+                  --accent, which is forbidden on this band. */}
+              <div className="font-display text-sm lg:text-base font-bold uppercase tracking-[0.14em]" style={{ color: 'var(--accent-on-dark)' }}>
                 {stat.label}
               </div>
               <div className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.55)' }}>{stat.desc}</div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   )

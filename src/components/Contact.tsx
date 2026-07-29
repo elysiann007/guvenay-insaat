@@ -1,6 +1,8 @@
 import { useId, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Phone, Mail, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react'
+import RevealHeading from './RevealHeading'
+import { useFadeVariants, VIEWPORT_ONCE, useTapFeedback } from '../lib/motion'
 
 const info = [
   { icon: Phone, label: 'Telefon', value: '+90 (212) 555 0100', sub: 'Hafta içi 09:00 - 18:00', href: 'tel:+902125550100' },
@@ -8,15 +10,9 @@ const info = [
   { icon: MapPin, label: 'Adres', value: 'Maslak Mah. No: 42, İstanbul', sub: 'Sarıyer / İstanbul', href: undefined },
 ]
 
-const projectTypes = ['Konut', 'Ticari', 'Endüstriyel', 'Restorasyon', 'Altyapı', 'Diğer']
+const projectTypes = ['Enerji İletim Hattı', 'Trafo Merkezi', 'Fiber Optik', 'Telekom Şebekesi', 'Bakım & Onarım', 'Diğer']
 
 type FieldName = 'name' | 'email' | 'phone' | 'message'
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: 'easeOut' as const } },
-}
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }
 
 function validateField(name: FieldName, value: string): string {
   const trimmed = value.trim()
@@ -31,7 +27,8 @@ function validateField(name: FieldName, value: string): string {
     case 'phone': {
       if (!trimmed) return ''
       const re = /^[0-9+()\s-]{7,}$/
-      return re.test(trimmed) ? '' : 'Lütfen geçerli bir telefon numarası giriniz.'
+      const digitCount = (trimmed.match(/[0-9]/g) || []).length
+      return re.test(trimmed) && digitCount >= 7 ? '' : 'Lütfen geçerli bir telefon numarası giriniz.'
     }
     case 'message':
       return trimmed.length < 10 ? 'Lütfen projenizi birkaç cümleyle anlatınız.' : ''
@@ -41,12 +38,15 @@ function validateField(name: FieldName, value: string): string {
 }
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', type: 'Konut' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', type: 'Enerji İletim Hattı' })
   const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({})
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({})
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const tapFeedback = useTapFeedback()
+  const fade = useFadeVariants()
+  const reduceMotion = useReducedMotion()
 
   const ids = {
     name: useId(),
@@ -90,10 +90,9 @@ export default function Contact() {
 
   const labelCls = 'block text-[11px] font-bold uppercase tracking-[0.16em] mb-1'
   const errorCls = 'text-xs mt-1.5 font-semibold'
-  // Small accent-colored body text — must use --accent-strong, never --accent
-  // (§0: --accent is large-display/icon-only). Errors sit on --surface/--bg-alt,
-  // which is exactly what --accent-strong is tuned for.
-  const errorColor = 'var(--accent-strong)'
+  // --accent is the single verified role for body-scale text on
+  // --surface/--bg-alt (index.css §ACCENT) — errors sit on exactly that band.
+  const errorColor = 'var(--accent)'
 
   const fieldProps = (field: FieldName) => ({
     id: ids[field],
@@ -117,21 +116,20 @@ export default function Contact() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-            variants={stagger}
+            viewport={VIEWPORT_ONCE}
+            variants={fade.stagger}
             className="lg:col-span-5"
           >
-            <motion.div variants={fadeUp}>
+            <motion.div variants={fade.eyebrow}>
               <span className="eyebrow">İletişim</span>
             </motion.div>
-            <motion.h2
-              variants={fadeUp}
+            <RevealHeading
+              as="h2"
+              lines={['Projenizi Konuşalım']}
               className="font-display text-4xl lg:text-5xl font-black tracking-tight mt-5 leading-[1.05]"
               style={{ color: 'var(--text)' }}
-            >
-              Projenizi Konuşalım
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-base lg:text-lg mt-5 mb-10" style={{ color: 'var(--text-soft)' }}>
+            />
+            <motion.p variants={fade.body} className="text-base lg:text-lg mt-5 mb-10" style={{ color: 'var(--text-soft)' }}>
               Ücretsiz keşif ve fiyat teklifi için bize ulaşın.
             </motion.p>
 
@@ -139,7 +137,7 @@ export default function Contact() {
               {info.map((item) => {
                 const Wrapper = item.href ? 'a' : 'div'
                 return (
-                  <motion.div key={item.label} variants={fadeUp}>
+                  <motion.div key={item.label} variants={fade.item}>
                     <Wrapper
                       {...(item.href ? { href: item.href } : {})}
                       className="group flex gap-5 py-5 hairline-top last:hairline-bottom cursor-pointer"
@@ -148,7 +146,7 @@ export default function Contact() {
                       <item.icon size={19} className="shrink-0 mt-1" style={{ color: 'var(--accent)' }} aria-hidden="true" />
                       <div className="min-w-0">
                         <div className="text-[11px] font-bold uppercase tracking-[0.16em]" style={{ color: 'var(--text-dim)' }}>{item.label}</div>
-                        <div className="text-sm lg:text-base font-bold mt-1 break-words transition-colors group-hover:text-[var(--accent-strong)]" style={{ color: 'var(--text)' }}>{item.value}</div>
+                        <div className="text-sm lg:text-base font-bold mt-1 break-words transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text)' }}>{item.value}</div>
                         <div className="text-xs mt-0.5" style={{ color: 'var(--text-soft)' }}>{item.sub}</div>
                       </div>
                     </Wrapper>
@@ -160,10 +158,10 @@ export default function Contact() {
 
           {/* Right — form */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
+            variants={fade.media}
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT_ONCE}
             className="lg:col-span-7"
           >
             <div
@@ -177,9 +175,9 @@ export default function Contact() {
               <span className="absolute top-0 left-0 w-full h-[3px]" style={{ background: 'var(--accent)' }} aria-hidden="true" />
               {sent ? (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.97 }}
+                  initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  transition={{ duration: reduceMotion ? 0 : 0.3, ease: 'easeOut' }}
                   role="status"
                   aria-live="polite"
                   className="flex flex-col items-center justify-center gap-4 py-16 text-center"
@@ -187,17 +185,18 @@ export default function Contact() {
                   <CheckCircle size={40} strokeWidth={1.5} style={{ color: 'var(--accent)' }} aria-hidden="true" />
                   <h3 className="font-display text-2xl font-black" style={{ color: 'var(--text)' }}>Mesajınız Alındı!</h3>
                   <p className="text-sm" style={{ color: 'var(--text-soft)' }}>En kısa sürede sizinle iletişime geçeceğiz.</p>
-                  <button
+                  <motion.button
+                    whileTap={tapFeedback}
                     onClick={() => {
                       setSent(false)
-                      setForm({ name: '', email: '', phone: '', message: '', type: 'Konut' })
+                      setForm({ name: '', email: '', phone: '', message: '', type: 'Enerji İletim Hattı' })
                       setTouched({})
                       setErrors({})
                     }}
                     className="btn-secondary mt-3"
                   >
                     Yeni Mesaj Gönder
-                  </button>
+                  </motion.button>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-7">
@@ -273,8 +272,9 @@ export default function Contact() {
                     <legend className={labelCls} style={{ color: 'var(--text-dim)' }}>Proje Türü</legend>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {projectTypes.map((t) => (
-                        <button
+                        <motion.button
                           key={t}
+                          whileTap={tapFeedback}
                           type="button"
                           onClick={() => setForm((f) => ({ ...f, type: t }))}
                           aria-pressed={form.type === t}
@@ -286,7 +286,7 @@ export default function Contact() {
                           }}
                         >
                           {t}
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
                   </fieldset>
@@ -309,7 +309,12 @@ export default function Contact() {
                     {renderError('message')}
                   </div>
 
-                  <button type="submit" disabled={sending} className="btn-primary w-full !py-4 disabled:opacity-60 disabled:cursor-not-allowed">
+                  <motion.button
+                    whileTap={tapFeedback}
+                    type="submit"
+                    disabled={sending}
+                    className="btn-primary w-full !py-4 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
                     {sending ? (
                       <>
                         <motion.div
@@ -326,7 +331,7 @@ export default function Contact() {
                         Teklif Talep Et
                       </>
                     )}
-                  </button>
+                  </motion.button>
                 </form>
               )}
             </div>

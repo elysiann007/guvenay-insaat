@@ -2,142 +2,76 @@
 
 /*
  * === TOKEN LAYER ===================================================
- * Canonical values live on the legacy custom-property names (--bg,
- * --text, --accent, ...) so every existing component that reads
- * `var(--foo)` inline keeps working untouched. The @theme block below
- * simply re-exports the same live variables under Tailwind's `--color-*`
- * / `--text-*` namespaces so new work can use real utilities
- * (`bg-surface`, `text-dim`, `text-h1`, ...) instead of inline styles.
+ * Single light theme (ALTYAPI-PLAN.md §1). Dark mode has been removed
+ * entirely — there is no `prefers-color-scheme` block and no
+ * `data-theme` attribute handling. Canonical values live on the legacy
+ * custom-property names (--bg, --text, --accent, ...) so every existing
+ * component that reads `var(--foo)` inline keeps working untouched. The
+ * @theme block below simply re-exports the same variables under
+ * Tailwind's `--color-*` / `--text-*` namespaces so new work can use
+ * real utilities (`bg-surface`, `text-dim`, `text-h1`, ...) instead of
+ * inline styles.
  *
- * Theming contract:
- *   1. Dark values apply by default via `prefers-color-scheme: dark`.
- *   2. An explicit `data-theme="dark"` / `data-theme="light"` on the
- *      root element always wins over the media query, in both
- *      directions (Phase 2 ships the toggle that sets this attribute).
+ * Every ratio below was measured with the WCAG relative-luminance
+ * formula and is noted at the point of use; do not substitute or
+ * "improve" any hex value without re-measuring.
  * ===================================================================
  */
 
 @layer base {
   :root {
-    /* === SURFACES — light === */
+    /* === SURFACES === */
     --bg: #F8FAFC;          /* page base */
-    --bg-alt: #EBF0F5;      /* alternating section band */
+    --bg-alt: #E9EEF5;      /* alternating section band */
     --surface: #FFFFFF;     /* cards */
-    --ink: #0F172A;         /* always-dark contrast band (footer, stats, hero scrim) */
+    --navy: #1E3A8A;        /* corporate band / primary fill — white text 10.36 */
+    --ink: #0F172A;         /* always-dark contrast band (footer, stats, hero scrim) — white text 17.85 */
     --ink-soft: #1E293B;    /* lifted dark panel, on-ink cards */
 
-    /* === TEXT — light === */
-    --text: #0F172A;        /* headings — 17.06 on bg */
-    --text-soft: #334155;   /* body — 9.90 on bg */
-    --text-dim: #64748B;    /* captions — 4.55 on bg (AA floor; do not lighten) */
+    /* === TEXT === */
+    --text: #0F172A;        /* headings — bg 17.06 / alt 15.31 */
+    --text-soft: #334155;   /* body — bg 9.90 / alt 8.88 */
+    --text-dim: #586576;    /* secondary — bg 5.67 / alt 5.09 (the old #64748B failed alt at 4.08) */
 
-    /* === ACCENT — light. Two roles, never collapse them:
-       --accent large display type (>=24px bold) / icons / rules / focus rings only.
-       --accent-strong any filled control carrying white text + accent body text. === */
-    --accent: #EA580C;
-    --accent-strong: #C2410C;
-    --accent-dark: #C2410C;  /* legacy alias, kept in sync with --accent-strong */
-    --accent-soft: rgba(234, 88, 18, 0.08); /* decorative tint only, never text */
+    /* === ACCENT — single role. --accent works unmodified as body text on
+       both --bg (5.38) and --bg-alt (4.83) AND as a filled control with a
+       white label (5.63). Do not re-split this into two roles. === */
+    --accent: #A84D08;
+    --accent-soft: rgba(168, 77, 8, 0.08); /* decorative tint only, never text */
+    /* The ONLY gold permitted as text on --navy / --ink bands — navy 6.20,
+       ink 10.69. Plain --accent on navy measures 2.06 and must never be
+       used there. */
+    --accent-on-dark: #FBBF24;
 
-    /* === LINES — light ===
-       --border-strong is intentionally equal to --border-control: every
-       existing component treats it as a *meaningful* boundary (button
-       outlines, card rings, active-state borders), so it must clear the
-       same 3:1 UI-component floor as real form controls. */
-    --border: #E2E8F0;              /* decorative dividers only — 1.28, do not use for boundaries */
-    --border-control: #64748B;      /* form/control boundaries — 4.55, meets 1.4.11 */
-    --border-strong: var(--border-control);
-    --border-on-dark: rgba(255, 255, 255, 0.14); /* hairlines on always-dark --ink surfaces */
-  }
-
-  /* Dark tonal variants (not inversions) — default via OS preference */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0B1220;
-      --bg-alt: #111A2B;
-      --surface: #151E2E;
-      --ink: #05080F;          /* deeper than --bg so ink bands still read as a band */
-      --ink-soft: #121B2E;
-
-      --text: #F1F5F9;         /* headings — 17.09 */
-      --text-soft: #CBD5E1;    /* body — 12.61 */
-      --text-dim: #94A3B8;     /* captions — 7.30 */
-
-      --accent: #FB923C;       /* lightened for dark — 8.27, also usable as text here */
-      --accent-strong: #EA580C; /* 5.26 on dark surfaces */
-      --accent-dark: #EA580C;
-      --accent-soft: rgba(251, 146, 60, 0.10);
-
-      --border-control: #5A6B80; /* 3.43 on bg, 3.06 on surface */
-      --border-strong: var(--border-control);
-      /* --border and --border-on-dark are intentionally not redefined here:
-         --border stays decorative-only and is never load-bearing for
-         contrast; --border-on-dark is a fixed translucent white meant for
-         the always-dark --ink surfaces in either theme. */
-      --border: #1E293B;
-    }
-  }
-
-  /* Explicit override always wins over the media query, both directions */
-  :root[data-theme="dark"] {
-    --bg: #0B1220;
-    --bg-alt: #111A2B;
-    --surface: #151E2E;
-    --ink: #05080F;
-    --ink-soft: #121B2E;
-
-    --text: #F1F5F9;
-    --text-soft: #CBD5E1;
-    --text-dim: #94A3B8;
-
-    --accent: #FB923C;
-    --accent-strong: #EA580C;
-    --accent-dark: #EA580C;
-    --accent-soft: rgba(251, 146, 60, 0.10);
-
-    --border: #1E293B;
-    --border-control: #5A6B80;
-    --border-strong: var(--border-control);
-  }
-
-  :root[data-theme="light"] {
-    --bg: #F8FAFC;
-    --bg-alt: #EBF0F5;
-    --surface: #FFFFFF;
-    --ink: #0F172A;
-    --ink-soft: #1E293B;
-
-    --text: #0F172A;
-    --text-soft: #334155;
-    --text-dim: #64748B;
-
-    --accent: #EA580C;
-    --accent-strong: #C2410C;
-    --accent-dark: #C2410C;
-    --accent-soft: rgba(234, 88, 18, 0.08);
-
-    --border: #E2E8F0;
-    --border-control: #64748B;
-    --border-strong: var(--border-control);
+    /* === LINES === */
+    --border: #E2E8F0;              /* decorative dividers only — do not use for boundaries */
+    --border-control: #64748B;      /* form/control boundaries — bg 4.55, alt 4.08, clears 3:1 (1.4.11) */
+    --border-strong: var(--border-control); /* deprecated alias, kept for existing component references */
+    --border-on-dark: rgba(255, 255, 255, 0.14); /* hairlines on --ink / --navy surfaces */
   }
 
   * { box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;    /* removes the 300ms tap delay */
+    overscroll-behavior: contain;  /* stops accidental pull-to-refresh */
+  }
 
   body {
     background-color: var(--bg);
     color: var(--text);
     font-family: 'Source Sans 3', system-ui, sans-serif;
+    font-size: 16px; /* never below 16px on mobile — prevents iOS auto-zoom on focus */
     overflow-x: hidden;
     margin: 0;
+    min-height: 100dvh;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  /* Selection uses --accent-strong, not --accent: selected text renders
-     white-on-fill, and #EA580C fails AA for that (3.56) — see token notes. */
-  ::selection { background-color: var(--accent-strong); color: #fff; }
+  ::selection { background-color: var(--accent); color: #fff; }
 
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -157,16 +91,16 @@
 }
 
 /*
- * === TAILWIND v4 THEME — real utilities over the same live variables ===
- * These are aliases (var(--x)), not copies: because CSS custom properties
- * resolve at used-value time, every utility generated from this block
- * (bg-surface, text-dim, border-border-control, ...) tracks the current
- * theme automatically, in light, dark, and the data-theme override.
+ * === TAILWIND v4 THEME — real utilities over the same variables ===
+ * These are aliases (var(--x)), not copies, so every utility generated
+ * from this block (bg-surface, text-dim, border-border-control, ...)
+ * tracks the token values above automatically.
  */
 @theme {
   --color-bg: var(--bg);
   --color-bg-alt: var(--bg-alt);
   --color-surface: var(--surface);
+  --color-navy: var(--navy);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
 
@@ -175,8 +109,8 @@
   --color-dim: var(--text-dim);
 
   --color-accent: var(--accent);
-  --color-accent-strong: var(--accent-strong);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-on-dark: var(--accent-on-dark);
 
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
@@ -186,15 +120,30 @@
   /* Body/UI font — Lexend headings stay opt-in via .font-display */
   --font-sans: 'Source Sans 3', system-ui, sans-serif;
 
-  /* Fluid type scale (REDESIGN-PLAN.md §2). h1 is capped at 7.5rem, not
-     12rem — 12rem overflows Turkish compound headings at 375px. */
+  /* Fluid type scale. h1 is capped at 7.5rem, not 12rem — 12rem overflows
+     Turkish compound headings at 375px.
+
+     Line heights are set for TURKISH, which needs more leading than
+     undiacriticked Latin: Ş/Ç carry a cedilla below the baseline and Ğ/İ
+     carry marks above cap height, so tight display leading makes adjacent
+     lines collide. Measured with canvas ink bounds at 44px/900: marks on
+     Ğ/İ rise 42.0px above the baseline and the Ş/ç cedilla drops 11.0px
+     below it, so
+     consecutive lines need 53.0px (ratio 1.205) to avoid touching. The
+     current hero headline hits this worst case exactly — "Şebekeleri" and
+     "Güvenle" both start at the left edge, so the cedilla and the breve
+     align horizontally as well as vertically.
+
+     Do not tighten these below 1.22 / 1.25 without re-measuring ink bounds
+     for Ş, Ğ, İ, ı and ç. An undiacriticked Latin string will not reveal
+     the collision. */
   --text-h1: clamp(2.75rem, 9vw, 7.5rem);
-  --text-h1--line-height: 0.95;
+  --text-h1--line-height: 1.22;
   --text-h1--letter-spacing: -0.04em;
   --text-h1--font-weight: 900;
 
   --text-h2: clamp(2rem, 4.5vw, 3.5rem);
-  --text-h2--line-height: 1.05;
+  --text-h2--line-height: 1.25;
   --text-h2--letter-spacing: -0.03em;
   --text-h2--font-weight: 800;
 
@@ -208,6 +157,37 @@
   --text-eyebrow: 0.72rem;
   --text-eyebrow--letter-spacing: 0.22em;
   --text-eyebrow--font-weight: 700;
+}
+
+/*
+ * === SHORT-VIEWPORT DISPLAY SCALE ===
+ * On short phones (iPhone SE class, <=700px tall) the full-height hero
+ * headline and the fixed mobile CTA bar cannot both fit. Measured at
+ * 375x667: the hero content overflowed min-h-svh by ~129px, which pushed
+ * the glass tag card 112px behind the CTA bar.
+ *
+ * Shrinking the display scale here is deliberate — the alternative
+ * (letting content collide with a fixed bar) is a real usability bug,
+ * whereas a smaller headline on a small screen is expected.
+ *
+ * This lives in @layer base so it overrides the @theme value above
+ * (Tailwind v4 layer order: theme < base < components < utilities).
+ * Line-height stays 1.22 for the Turkish diacritic clearance documented
+ * above — only the size changes.
+ */
+@layer base {
+  @media (max-height: 700px) and (max-width: 1023px) {
+    :root {
+      --text-h1: clamp(1.75rem, 7.5vw, 2.25rem);
+      --text-h2: clamp(1.5rem, 5vw, 2rem);
+      /* At 28px the 1.22 ratio leaves only 0.3px of diacritic headroom
+         (measured: Ğ/İ + Ş/ç need 34.0px, 1.22 gives 34.3px). Nudged to
+         1.25 for ~1.2px of clearance so antialiasing can't make the marks
+         read as touching. */
+      --text-h1--line-height: 1.25;
+      --text-h2--line-height: 1.28;
+    }
+  }
 }
 
 /*
@@ -225,10 +205,7 @@
     letter-spacing: -0.02em;
   }
 
-  /* Small uppercase tracked label.
-     Text uses --accent-strong, not --accent: at 0.72rem this is normal-size
-     text, and #EA580C fails AA normal-text contrast (3.40) — see §0. The
-     hairline rule stays --accent since rules only need the 3:1 UI floor. */
+  /* Small uppercase tracked label. */
   .eyebrow {
     display: inline-flex;
     align-items: center;
@@ -237,7 +214,7 @@
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--accent-strong);
+    color: var(--accent);
   }
   .eyebrow::before {
     content: '';
@@ -245,8 +222,10 @@
     height: 1px;
     background: var(--accent);
   }
-  .eyebrow-on-dark { color: #FB923C; }
-  .eyebrow-on-dark::before { background: #FB923C; }
+  /* On navy/ink bands, plain --accent measures 2.06 — use the dedicated
+     on-dark gold instead. */
+  .eyebrow-on-dark { color: var(--accent-on-dark); }
+  .eyebrow-on-dark::before { background: var(--accent-on-dark); }
 
   /* === BUTTONS === */
   .btn-primary {
@@ -265,9 +244,7 @@
     cursor: pointer;
     transition: background 0.2s ease-out, border-color 0.2s ease-out, transform 0.2s ease-out;
   }
-  /* Hover fill is --accent-strong, not --accent: this is a filled control
-     with a white label, and #EA580C fails AA for that pairing (3.56). */
-  .btn-primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); transform: translateY(-1px); }
+  .btn-primary:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-1px); }
   .btn-primary:active { transform: translateY(0); }
 
   .btn-secondary {
@@ -286,9 +263,7 @@
     cursor: pointer;
     transition: border-color 0.2s ease-out, color 0.2s ease-out, transform 0.2s ease-out;
   }
-  /* Hover label uses --accent-strong (small text); border may use --accent
-     since a border is a non-text rule. */
-  .btn-secondary:hover { border-color: var(--accent); color: var(--accent-strong); transform: translateY(-1px); }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
 
   /* White-outline variant for use on dark imagery */
   .btn-on-dark {
@@ -311,7 +286,9 @@
   .btn-on-dark:hover { background: rgba(255, 255, 255, 0.14); border-color: #fff; transform: translateY(-1px); }
 
   /* === INPUTS — underline only. Boundary is --border-control, never the
-     decorative --border, per the non-negotiable rule. === */
+     decorative --border, per the non-negotiable rule. Font size stays at
+     the body 0.95rem (>=16px equivalent given the 16px root) so mobile
+     Safari never auto-zooms on focus. === */
   .input-line {
     width: 100%;
     background: transparent;
@@ -320,40 +297,13 @@
     border-radius: 0;
     color: var(--text);
     font-family: 'Source Sans 3', sans-serif;
-    font-size: 0.95rem;
+    font-size: 1rem;
     padding: 0.75rem 0;
     outline: none;
     transition: border-color 0.2s ease-out;
   }
   .input-line::placeholder { color: var(--text-dim); }
   .input-line:focus { border-bottom-color: var(--accent); box-shadow: 0 1px 0 0 var(--accent); }
-
-  /* === LINKS === */
-  .link-underline {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-weight: 600;
-    color: var(--text);
-    cursor: pointer;
-    transition: color 0.2s ease-out;
-  }
-  .link-underline::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -3px;
-    width: 100%;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.25s ease-out;
-  }
-  /* --accent-strong, not --accent: this recolors normal-size link text. */
-  .link-underline:hover { color: var(--accent-strong); }
-  .link-underline:hover::after { transform: scaleX(1); }
 
   /* === RULES === */
   .hairline-top { border-top: 1px solid var(--border); }
@@ -385,10 +335,51 @@
     transform: scale(1.06);
   }
 
-  /* === CARD SURFACE — subtle lift on hover, editorial (no rounding) === */
-  .card-lift { transition: box-shadow 0.25s ease-out, transform 0.25s ease-out, border-color 0.25s ease-out; }
-  .card-lift:hover {
-    box-shadow: 0 24px 48px -28px rgba(5, 8, 15, 0.22);
-    transform: translateY(-3px);
+  /* === LIQUID GLASS — floating navbar + hero tag card, always over dark
+     hero imagery. The 0.55 alpha is MEASURED, not a guess: sampled against
+     the brightest pixel in the navbar band of the new hero image,
+     rgb(239,221,177), white text over black glass measures 3.67:1 at
+     alpha 0.40 (fails WCAG AA) and 5.92:1 at alpha 0.55 (passes). Do not
+     lower this alpha without re-measuring against the actual hero pixels —
+     a different reference spec's 0.4 is not safe here. */
+  .liquid-glass {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px) saturate(1.1);
+    -webkit-backdrop-filter: blur(8px) saturate(1.1);
+    border: none;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  /* Inset gradient hairline — a 1.4px "border" drawn via masked padding
+     rather than an actual border, so it can fade top/bottom independently
+     of the glass fill. */
+  .liquid-glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1.4px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.1) 20%,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0) 60%,
+      rgba(255, 255, 255, 0.1) 80%,
+      rgba(255, 255, 255, 0.3) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  /* Fallback where backdrop-filter isn't supported: no blur to lean on, so
+     raise the fill opacity instead of leaving translucent-without-blur
+     glass (which would fail contrast against light hero pixels). */
+  @supports (not (backdrop-filter: blur(1px))) and (not (-webkit-backdrop-filter: blur(1px))) {
+    .liquid-glass {
+      background: rgba(0, 0, 0, 0.75);
+    }
   }
 }

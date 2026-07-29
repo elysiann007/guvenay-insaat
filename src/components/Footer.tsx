@@ -1,7 +1,9 @@
+import { motion } from 'framer-motion'
 import { Phone, Mail, MapPin, ArrowUp } from 'lucide-react'
+import { useTapFeedback } from '../lib/motion'
 
 const footerLinks = {
-  'Hizmetler': ['Konut Projeleri', 'Ticari Yapılar', 'Endüstriyel Tesisler', 'Restorasyon', 'Altyapı'],
+  'Hizmetler': ['Enerji İletim Hatları', 'Trafo Merkezleri', 'Fiber Optik Altyapı', 'Telekom Şebeke Kurulumu', 'Saha Bakım ve İşletme'],
   'Kurumsal': ['Hakkımızda', 'Kariyer', 'Basın', 'Sertifikalar', 'Sürdürülebilirlik'],
   'Projeler': ['Tamamlanan', 'Devam Eden', 'Referanslar', 'Ödüller'],
 }
@@ -17,6 +19,7 @@ const socials = [
 // content conventions apply (see .eyebrow-on-dark / --border-on-dark in
 // src/index.css) rather than the light/dark --text tokens.
 export default function Footer() {
+  const tapFeedback = useTapFeedback()
   return (
     <footer className="bg-[var(--ink)]">
       <div className="max-w-7xl mx-auto px-5 lg:px-8">
@@ -33,25 +36,28 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm leading-relaxed mb-7 max-w-xs text-white/55">
-              1994'ten bu yana Türkiye'nin dört bir yanında kalıcı yapılar inşa ediyoruz.
+              1994'ten bu yana Türkiye'nin dört bir yanında enerji nakil
+              hatları ve telekom altyapısı kuruyoruz.
             </p>
 
-            <address className="flex flex-col gap-3 not-italic">
+            {/* min-h-11 + py-2 on each link gives the 20px-tall text row a
+                full 44px tap target without changing visual line height */}
+            <address className="flex flex-col not-italic">
               <a
                 href="tel:+902125550100"
-                className="flex items-center gap-2.5 text-sm text-white/65 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
+                className="flex items-center gap-2.5 min-h-11 py-2 text-sm text-white/65 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
               >
                 <Phone size={14} className="shrink-0 text-[var(--accent)]" />
                 +90 (212) 555 0100
               </a>
               <a
                 href="mailto:info@guvenayinsaat.com.tr"
-                className="flex items-center gap-2.5 text-sm text-white/65 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
+                className="flex items-center gap-2.5 min-h-11 py-2 text-sm text-white/65 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
               >
                 <Mail size={14} className="shrink-0 text-[var(--accent)]" />
                 info@guvenayinsaat.com.tr
               </a>
-              <span className="flex items-center gap-2.5 text-sm text-white/65">
+              <span className="flex items-center gap-2.5 min-h-11 py-2 text-sm text-white/65">
                 <MapPin size={14} className="shrink-0 text-[var(--accent)]" />
                 Maslak, İstanbul
               </span>
@@ -60,16 +66,17 @@ export default function Footer() {
             {/* Socials */}
             <div className="flex items-center gap-2.5 mt-8">
               {socials.map((s) => (
-                <a
+                <motion.a
                   key={s.label}
+                  whileTap={tapFeedback}
                   href="#"
                   aria-label={s.label}
-                  className="w-11 h-11 flex items-center justify-center border border-[var(--border-on-dark)] text-white/70 rounded-sm transition-all duration-300 hover:-translate-y-0.5 hover:text-white hover:border-white/40 focus-visible:-translate-y-0.5 focus-visible:text-white"
+                  className="w-11 h-11 flex items-center justify-center border border-[var(--border-on-dark)] text-white/70 rounded-sm transition-all duration-200 hover:-translate-y-0.5 hover:text-white hover:border-white/40 focus-visible:-translate-y-0.5 focus-visible:text-white"
                 >
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                     <path d={s.path} />
                   </svg>
-                </a>
+                </motion.a>
               ))}
             </div>
           </div>
@@ -78,12 +85,12 @@ export default function Footer() {
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
               <h4 className="eyebrow eyebrow-on-dark mb-6">{title}</h4>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col">
                 {links.map((link) => (
                   <li key={link}>
                     <a
                       href="#"
-                      className="text-sm text-white/55 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
+                      className="flex items-center min-h-11 py-2 text-sm text-white/55 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
                     >
                       {link}
                     </a>
@@ -97,25 +104,28 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left border-t border-[var(--border-on-dark)]">
           <p className="text-xs text-white/55">
-            © 2024 Güvenay İnşaat. Tüm hakları saklıdır.
+            © {new Date().getFullYear()} Güvenay İnşaat. Tüm hakları saklıdır.
           </p>
           <div className="flex items-center gap-5 text-xs text-white/55">
-            <a href="#" className="rounded-sm transition-colors hover:text-white focus-visible:text-white">Gizlilik</a>
-            <a href="#" className="rounded-sm transition-colors hover:text-white focus-visible:text-white">Kullanım Koşulları</a>
+            <a href="#" className="flex items-center justify-center min-h-11 min-w-11 rounded-sm transition-colors hover:text-white focus-visible:text-white">Gizlilik</a>
+            <a href="#" className="flex items-center justify-center min-h-11 min-w-11 rounded-sm transition-colors hover:text-white focus-visible:text-white">Kullanım Koşulları</a>
           </div>
         </div>
       </div>
 
-      {/* Back to top — accent-strong fill, not accent: a filled control
-          carrying a white icon, same rule as any filled control with
-          white content (see REDESIGN-PLAN.md §0). */}
-      <button
+      {/* Back to top — --accent is a single role now (ALTYAPI-PLAN §1): it
+          works unmodified as a filled control carrying a white icon. Lifted
+          clear of the mobile sticky CTA bar (App.tsx, ~78.4px tall) with a
+          16px+ gap on small screens; the bar is hidden from md: up so
+          bottom-5 is safe there. */}
+      <motion.button
+        whileTap={tapFeedback}
         onClick={() => document.querySelector('#hero')?.scrollIntoView({ behavior: 'smooth' })}
-        className="fixed bottom-5 right-5 w-12 h-12 flex items-center justify-center z-40 cursor-pointer bg-[var(--accent-strong)] text-white rounded-sm transition-transform duration-300 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+        className="fixed right-5 bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-5 w-12 h-12 flex items-center justify-center z-40 cursor-pointer bg-[var(--accent)] text-white rounded-sm transition-transform duration-200 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
         aria-label="Yukarı çık"
       >
         <ArrowUp size={18} />
-      </button>
+      </motion.button>
     </footer>
   )
 }
