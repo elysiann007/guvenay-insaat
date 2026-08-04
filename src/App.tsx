@@ -5,6 +5,7 @@ import About from './components/About'
 import Services from './components/Services'
 import Projects from './components/Projects'
 import Stats from './components/Stats'
+import Certificates from './components/Certificates'
 import Testimonials from './components/Testimonials'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
@@ -20,6 +21,7 @@ export default function App() {
         <Services />
         <Projects />
         <Stats />
+        <Certificates />
         <Testimonials />
         <Contact />
       </main>

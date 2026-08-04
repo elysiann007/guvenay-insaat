@@ -7,6 +7,7 @@ const links = [
   { label: 'Hakkımızda', href: '#about' },
   { label: 'Hizmetler', href: '#services' },
   { label: 'Projeler', href: '#projects' },
+  { label: 'Belgelerimiz', href: '#certificates' },
   { label: 'İletişim', href: '#contact' },
 ]
 
