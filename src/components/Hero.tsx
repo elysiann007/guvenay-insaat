@@ -30,12 +30,19 @@ export default function Hero() {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
   const videoScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1, 1.18])
 
-  // İki ayrı taşıyıcı, çünkü iki kırılımın kaynak malzemesi farklı. Mobilde
-  // sahadan çekilmiş 478x850 dikey telefon klibi var; o genişlik ancak dikey bir
-  // telefon kadrajında ayakta duruyor. Masaüstünde ise makine parkının drone
-  // karelerinden kurulmuş 1600x900 ken-burns klibi (hero-desktop.mp4) oynuyor —
-  // 6 sahne, son karesi ilk karesiyle birebir aynı olduğu için loop noktasında
-  // sıçrama yok. Üretimi: scratchpad/buildhero.mjs.
+  // İki kırılım AYNI hero'yu oynatıyor: aynı 6 drone karesi, aynı sıra, aynı
+  // süreler, ikisi de 22.5 sn. Fark yalnızca kadrajda — masaüstü 1600x900,
+  // mobil 540x960. Her ikisinin de son karesi ilk karesiyle birebir aynı
+  // (kapanış sahnesi açılış sahnesinin tersi), o yüzden loop noktasında
+  // sıçrama yok.
+  //
+  // Neden tek dosya değil: 16:9 klibi telefonda object-cover ile kırpmak
+  // kaynağın sadece %32'lik orta dilimini gösterirdi ve yan yana dizilmiş
+  // filonun büyük kısmı kadraj dışında kalırdı — yani hero'nun anlattığı şey.
+  // Bu yüzden dikey sürüm ayrı kadrajlanıyor ve hareketi yatay kaydırma:
+  // dar bir dilim filo boyunca ilerliyor, 22.5 sn'de makinelerin tamamı
+  // görülüyor. Üretimi: scratchpad/buildhero.mjs (yatay) ve
+  // scratchpad/buildmobile.mjs (dikey).
   // Seeded synchronously from the media query, not defaulted to false: with a
   // false default the mobile branch mounts for one frame on desktop too, and
   // the browser has already begun fetching the 1.1MB video by the time the
@@ -99,13 +106,23 @@ export default function Hero() {
 
           Two scrims, because the two breakpoints have different problems.
 
-          MOBILE: the copy runs full width over the yard video, so the scrim
-          has to be uniform and it has to be heavy. The eyebrow is
-          --accent-on-dark gold sitting on blown-out daylight sky, raw
-          (255,250,236); gold needs alpha 0.73 there to clear AA where white
-          would need only 0.58. That is why the gradient RISES toward the top
-          rather than falling. Do not lighten these to "let the sky show"
-          without first moving the hero eyebrow off gold.
+          MOBILE: the copy runs full width over the clip, so the scrim has to
+          be uniform and it has to be heavy. The eyebrow is --accent-on-dark
+          gold sitting on blown-out daylight sky; gold needs roughly alpha 0.73
+          there to clear AA where white would need only 0.58. That is why the
+          gradient RISES toward the top rather than falling. Do not lighten
+          these to "let the sky show" without first moving the hero eyebrow
+          off gold.
+
+          These stops survived the swap to the reframed machine-park clip
+          unchanged — both the old phone footage and the new one are bright
+          daylight drone material of the same yard, and the margins barely
+          moved (eyebrow 5.06 -> 5.00). Checked at two phone shapes, because
+          they crop the clip differently: 375x812 trims ~18% of the width,
+          while a 9:16 screen (360x640) shows it whole, putting the frame's
+          outer edges under the copy for the first time.
+            375x812  h1 5.67 · eyebrow 5.00 · sub-copy 5.40 · btn 7.60 · tag 9.04
+            360x640  h1 8.17 · eyebrow 5.38 · sub-copy 5.38 · btn 6.41 · tag 8.45
 
           DESKTOP: the copy is confined to the left grid column, so darkening
           the full frame was overkill — it was flattening the machinery and
