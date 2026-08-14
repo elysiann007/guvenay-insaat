@@ -30,10 +30,12 @@ export default function Hero() {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
   const videoScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1, 1.18])
 
-  // The site video is a 478x850 phone clip of the makine parkı — at that width it
-  // only holds up inside a portrait phone frame, so it plays on mobile only. On
-  // desktop we show the sharp 1920px night-works photograph instead, which is the
-  // one that survives being stretched across a wide viewport.
+  // İki ayrı taşıyıcı, çünkü iki kırılımın kaynak malzemesi farklı. Mobilde
+  // sahadan çekilmiş 478x850 dikey telefon klibi var; o genişlik ancak dikey bir
+  // telefon kadrajında ayakta duruyor. Masaüstünde ise makine parkının drone
+  // karelerinden kurulmuş 1600x900 ken-burns klibi (hero-desktop.mp4) oynuyor —
+  // 6 sahne, son karesi ilk karesiyle birebir aynı olduğu için loop noktasında
+  // sıçrama yok. Üretimi: scratchpad/buildhero.mjs.
   // Seeded synchronously from the media query, not defaulted to false: with a
   // false default the mobile branch mounts for one frame on desktop too, and
   // the browser has already begun fetching the 1.1MB video by the time the
@@ -51,14 +53,29 @@ export default function Hero() {
 
   return (
     <section id="hero" ref={sectionRef} className="relative min-h-svh flex flex-col overflow-hidden" style={{ background: 'var(--ink)' }}>
-      {/* Background: parallax site photograph on desktop, portrait yard clip on
-          mobile. Both are the company's own material — no stock, no stand-ins. */}
-      {isDesktop ? (
+      {/* Taşıyıcı: masaüstünde makine parkı ken-burns klibi, mobilde dikey saha
+          klibi. İkisi de firmanın kendi malzemesi — stok görsel yok.
+
+          Hareket azaltma tercihinde hiçbir klip oynatılmıyor; her iki kırılım da
+          kendi poster karesine düşüyor. Poster'lar klibin İLK karesi olduğu için
+          düşen kadraj hareketli halinkiyle aynı, kırpma kayması olmuyor. */}
+      {reduceMotion ? (
         <motion.img
           className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{ scale: videoScale }}
-          src="/media/hero.webp"
+          src={isDesktop ? '/media/hero-desktop-poster.webp' : '/media/hero-mobile-poster.webp'}
           alt=""
+          aria-hidden="true"
+        />
+      ) : isDesktop ? (
+        <motion.video
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ scale: videoScale }}
+          src="/media/hero-desktop.mp4"
+          poster="/media/hero-desktop-poster.webp"
+          autoPlay
+          muted
+          loop
+          playsInline
           aria-hidden="true"
         />
       ) : (
@@ -92,19 +109,37 @@ export default function Hero() {
 
           DESKTOP: the copy is confined to the left grid column, so darkening
           the full frame was overkill — it was flattening the machinery and
-          barriers on the right, which is the half of the photograph actually
-          worth showing. A single flat 64% wash was the price of protecting a
-          streetlight highlight at raw (252,255,255) sitting behind the h1 on
-          the LEFT. So the desktop scrim is split: a light vertical wash over
+          barriers on the right, which is the half of the frame actually worth
+          showing. So the desktop scrim is split: a light vertical wash over
           the whole frame, plus a horizontal one that only loads the left
           column.
 
-          Measured after the split (worst-case pixel per element box, image
-          composited under both layers at 1272x853):
-            alpha behind h1 0.703 (was a flat 0.64) — right third 0.316,
-            so the machinery reads at roughly twice its previous value
-            h1 6.29 · eyebrow 11.16 · sub-copy 8.50 · btn-on-dark 17.16
-            · glass tag 15.88 — all clear AA, h1 by 2x its 3:1 large-text bar.
+          Re-measured when the desktop backdrop became hero-desktop.mp4 (the
+          machine-park clip). That footage is far brighter than the night
+          photograph it replaced — blue sky, white truck panels, pale concrete
+          — and the old stops did NOT survive it: the gold eyebrow measured
+          4.01 against a 4.5 bar at 1920x1080, i.e. it failed. Note it PASSED
+          at 1280x800 (4.86), because at 1280 the copy sits hard against the
+          left edge where the horizontal band is at full strength, while at
+          1920 max-w-7xl centres it at x=348 where that band has already
+          decayed. Measuring only one width hides the other.
+
+          The fix loads the left column and the top edge (0.62/0.54 -> 0.70/0.62
+          horizontally, top stop 0.44 -> 0.52) and leaves the mid/right alone.
+          Cost to the imagery is ~1.4% more average alpha over the right third
+          (0.433 -> 0.439) — the machinery reads essentially as before.
+
+          Worst-case pixel per element box, over 45 frames sampled across the
+          whole 22.5s loop, at both 1272x852 and 1912x1080:
+            h1 5.51 / 5.38 (bar 3.0) · eyebrow 6.08 / 4.97 (bar 4.5)
+            · sub-copy 8.20 / 8.53 · btn-on-dark 12.10 / 12.33
+            · glass tag 5.80 / 6.57 — all clear AA.
+          The eyebrow is still the binding constraint at 4.97, so it is the
+          number to watch if the footage or the type ever changes.
+
+          Because the backdrop is now a video, a single frame is not a valid
+          sample — every stop above was checked against all 45 frames and the
+          worst one reported.
 
           Method, if either layer changes: replicate object-cover into the hero
           box, evaluate BOTH gradients per pixel and composite them
@@ -123,8 +158,8 @@ export default function Hero() {
         className="absolute inset-0 pointer-events-none hidden lg:block"
         style={{
           background: [
-            'linear-gradient(to right, color-mix(in srgb, var(--ink) 62%, transparent) 0%, color-mix(in srgb, var(--ink) 54%, transparent) 42%, transparent 74%)',
-            'linear-gradient(to top, color-mix(in srgb, var(--ink) 78%, transparent) 0%, color-mix(in srgb, var(--ink) 34%, transparent) 35%, color-mix(in srgb, var(--ink) 30%, transparent) 60%, color-mix(in srgb, var(--ink) 44%, transparent) 100%)',
+            'linear-gradient(to right, color-mix(in srgb, var(--ink) 70%, transparent) 0%, color-mix(in srgb, var(--ink) 62%, transparent) 42%, transparent 74%)',
+            'linear-gradient(to top, color-mix(in srgb, var(--ink) 78%, transparent) 0%, color-mix(in srgb, var(--ink) 30%, transparent) 35%, color-mix(in srgb, var(--ink) 30%, transparent) 60%, color-mix(in srgb, var(--ink) 52%, transparent) 100%)',
           ].join(', '),
         }}
       />
