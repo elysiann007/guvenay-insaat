@@ -1,15 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight, MapPin, Calendar } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { DURATION, EASE_OUT_EXPO, useTapFeedback } from '../lib/motion'
 
 export interface LightboxItem {
   id: number
-  name: string
-  location: string
-  year: string
   category: string
-  units: string
   img: string
   alt: string
 }
@@ -220,20 +216,14 @@ export default function Lightbox({ items, index, onClose, onNavigate }: Props) {
         />
 
         <div className="mt-4 shrink-0">
-          <h3 id="lightbox-title" className="font-display text-xl lg:text-2xl font-bold leading-tight text-white">
-            {item.name}
+          {/* No job name, location, or client — see Projects.tsx: this is a
+              plain photo gallery, not attributed to a specific job. The
+              alt text is the only claim made, and it describes only what
+              the photo shows. */}
+          <h3 id="lightbox-title" className="sr-only">
+            {item.alt}
           </h3>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs" style={{ color: 'rgba(255,255,255,0.72)' }}>
-            <span className="flex items-center gap-1"><MapPin size={11} aria-hidden="true" />{item.location}</span>
-            <span className="flex items-center gap-1"><Calendar size={11} aria-hidden="true" />{item.year}</span>
-            {/* On this always-dark panel plain --accent measures 2.06 —
-                --accent-on-dark is the verified gold for exactly this. */}
-            <span className="font-bold" style={{ color: 'var(--accent-on-dark)' }}>{item.units}</span>
-          </div>
-          {/* The photo is from the company's own archive but is not
-              necessarily a photo OF this job — say so rather than let the
-              pairing imply it. */}
-          <p className="text-xs mt-3 max-w-2xl" style={{ color: 'rgba(255,255,255,0.55)' }}>
+          <p className="text-xs max-w-2xl" style={{ color: 'rgba(255,255,255,0.72)' }}>
             {item.alt}
           </p>
         </div>

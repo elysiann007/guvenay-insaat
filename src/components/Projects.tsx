@@ -1,74 +1,50 @@
 import { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence, LayoutGroup, useReducedMotion } from 'framer-motion'
-import { MapPin, Calendar, Maximize2 } from 'lucide-react'
+import { Maximize2 } from 'lucide-react'
 import RevealHeading from './RevealHeading'
 import Lightbox from './Lightbox'
 import { DURATION, EASE_OUT_EXPO, VIEWPORT_ONCE, useTapFeedback } from '../lib/motion'
 
 type Category = 'Tümü' | 'Kablo & Kanal' | 'Trafo & Direk' | 'Boru & Altyapı'
 
-// İşler firmanın kendi referans dosyasından (docs/) birebir alınmıştır.
-// Fotoğraflar firmanın kendi saha arşivinden gelir; her kart o işin kendi
-// fotoğrafı olmayabileceği için `alt` metni fotoğrafın gerçekte ne
-// gösterdiğini tarif eder, kartın başlığını tekrar etmez.
+// Saf galeri — hangi fotoğrafın hangi işe/müşteriye ait olduğunu doğrulamadan
+// belirli bir iş adı, konum ya da ölçü iddia etmiyoruz (bkz. docs/EKSIK-BILGILER.md
+// #7). Kartlarda yalnızca disiplin kategorisi ve fotoğrafın gerçekte ne
+// gösterdiğini tarif eden `alt` metni var.
 const projects = [
   {
     id: 1,
-    name: 'ESBAŞ — Sadi TR / Döhler Enerji Hattı',
-    location: 'Gaziemir, İzmir',
-    year: '2025',
     category: 'Kablo & Kanal' as Category,
-    units: 'Kazı + Asfalt',
     img: '/media/project-1.webp',
     alt: 'Kablo kanalı kapatıldıktan sonra yeniden asfaltlanmış dar sokak',
   },
   {
     id: 2,
-    name: 'TEDAŞ — Metropol Arıza Müdahalesi',
-    location: 'İzmir Metropol',
-    year: '1996 – 2026',
     category: 'Kablo & Kanal' as Category,
-    units: '30 Yıldır Kesintisiz',
     img: '/media/project-2.webp',
     alt: 'Gece çalışması — trafiğe kapatılmış yolda bariyerler ve iş makineleri',
   },
   {
     id: 3,
-    name: 'GÜLER ELK. — Aliağa OSB, ADM 1 / ADM 2',
-    location: 'Aliağa, İzmir',
-    year: '2020',
     category: 'Kablo & Kanal' as Category,
-    units: '32 km OG + Fiber',
     img: '/media/project-3.webp',
     alt: 'Saha ekibi kırmızı kablo makarasından kablo çekerken',
   },
   {
     id: 4,
-    name: 'PUNTAYELİ — Trafo Temelleri',
-    location: 'Söke / Çeşme / Aliağa',
-    year: '2017',
     category: 'Trafo & Direk' as Category,
-    units: '50 Tonluk Temel',
     img: '/media/project-4.webp',
     alt: 'Direk dibine kurulmuş ahşap kalıp ve dökülmüş beton temel',
   },
   {
     id: 5,
-    name: 'TEDAŞ — Havai Hat Direk Dibi Betonlama',
-    location: 'İzmir – Manisa',
-    year: '2020 – 2022',
     category: 'Trafo & Direk' as Category,
-    units: '180 Direk',
     img: '/media/project-5.webp',
     alt: 'Tamamlanmış kaldırım kaplaması ve dibi betonlanmış aydınlatma direkleri',
   },
   {
     id: 6,
-    name: 'BASBAŞ — TM / Doğalgaz İstasyonu Hattı',
-    location: 'Bergama, İzmir',
-    year: '2025',
     category: 'Boru & Altyapı' as Category,
-    units: 'Kanal + Boru',
     img: '/media/project-6.webp',
     alt: 'Şehir içi cadde kenarında açılmış kanal, paletli ekskavatör ve reflektif yelekli saha ekibi',
   },
@@ -111,13 +87,12 @@ function ProjectCard({
           className="img-tone absolute inset-0 w-full h-full object-cover"
         />
 
-        {/* Scrim for legible overlay caption — token-derived from --ink so it
-            tracks theme, rather than a hardcoded old-palette rgba */}
+        {/* Faint scrim under the top-left badge only — a gallery card has no
+            caption to protect, so there is nothing to darken lower down. */}
         <div
-          className="absolute inset-0 transition-opacity duration-500 opacity-70 group-hover:opacity-90"
+          className="absolute inset-x-0 top-0 h-20 transition-opacity duration-500 opacity-60 group-hover:opacity-80"
           style={{
-            background:
-              'linear-gradient(to top, color-mix(in srgb, var(--ink) 88%, transparent) 0%, color-mix(in srgb, var(--ink) 25%, transparent) 45%, transparent 70%)',
+            background: 'linear-gradient(to bottom, color-mix(in srgb, var(--ink) 60%, transparent) 0%, transparent 100%)',
           }}
         />
 
@@ -139,35 +114,17 @@ function ProjectCard({
           <Maximize2 size={15} />
         </div>
 
-        {/* Stretched control. Deliberately a sibling overlay rather than a
-            wrapper around the caption: it keeps the <h3> a real heading in the
-            a11y tree, gives the card exactly one tab stop, and — because it
-            lives inside .group — finally lets `.group:focus-within` fire, which
-            is what releases the .img-tone grayscale for keyboard users. */}
+        {/* Stretched control. Gives the card exactly one tab stop and —
+            because it lives inside .group — lets `.group:focus-within`
+            fire, which is what releases the .img-tone grayscale for
+            keyboard users. */}
         <button
           ref={btnRef}
           type="button"
           onClick={() => btnRef.current && onOpen(project.id, btnRef.current)}
-          aria-label={`${project.name} — fotoğrafı büyüt`}
+          aria-label={`${project.alt} — fotoğrafı büyüt`}
           className="absolute inset-0 z-10 w-full h-full cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[var(--accent-on-dark)]"
         />
-
-        {/* Caption overlay — sits on the image, editorial gallery style */}
-        <div className="absolute inset-x-0 bottom-0 p-5 lg:p-6 translate-y-1.5 group-hover:translate-y-0 transition-transform duration-500">
-          <h3
-            className={`font-display font-bold leading-tight text-white ${featured ? 'text-2xl lg:text-3xl' : 'text-lg lg:text-xl'}`}
-          >
-            {project.name}
-          </h3>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs" style={{ color: 'rgba(255,255,255,0.72)' }}>
-            <span className="flex items-center gap-1"><MapPin size={11} />{project.location}</span>
-            <span className="flex items-center gap-1"><Calendar size={11} />{project.year}</span>
-            {/* This caption sits on a dark photo scrim (an --ink-derived
-                gradient), so plain --accent (2.06 there) is forbidden —
-                --accent-on-dark is the verified gold for exactly this band. */}
-            <span className="font-bold" style={{ color: 'var(--accent-on-dark)' }}>{project.units}</span>
-          </div>
-        </div>
       </div>
     </motion.div>
   )
