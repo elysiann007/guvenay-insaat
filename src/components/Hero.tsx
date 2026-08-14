@@ -41,8 +41,17 @@ export default function Hero() {
   // filonun büyük kısmı kadraj dışında kalırdı — yani hero'nun anlattığı şey.
   // Bu yüzden dikey sürüm ayrı kadrajlanıyor ve hareketi yatay kaydırma:
   // dar bir dilim filo boyunca ilerliyor, 22.5 sn'de makinelerin tamamı
-  // görülüyor. Üretimi: scratchpad/buildhero.mjs (yatay) ve
-  // scratchpad/buildmobile.mjs (dikey).
+  // görülüyor.
+  //
+  // İkisi de scratchpad/buildhero2.mjs ile üretiliyor. Kareler ffmpeg
+  // zoompan ile DEĞİL, sharp affine ile çiziliyor; bu bir tercih değil
+  // zorunluluk: zoompan kırpma dikdörtgenini tam sayı piksele yuvarlıyor ve
+  // ken-burns bu kadar yavaşken hareketi bozuyor. Ölçüldü — zoompan'li ilk
+  // sürümde zoom sahnesinde kareler arası fark %13 dalgalanıyor, kaydırma
+  // sahnesinde HER 4. KARE bir öncekinin kopyası çıkıyordu (7.0/7.0/6.9/0.24
+  // deseni), yani hareket durup sıçrıyordu. affine'in ondalık odx/ody'siyle
+  // aynı ölçüm %4.2 ve %6.5'e indi, kopya kare sıfır. Bu dosyaları yeniden
+  // üretecek olan zoompan'e dönmesin.
   // Seeded synchronously from the media query, not defaulted to false: with a
   // false default the mobile branch mounts for one frame on desktop too, and
   // the browser has already begun fetching the 1.1MB video by the time the
