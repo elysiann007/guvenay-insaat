@@ -1,38 +1,38 @@
 import { motion } from 'framer-motion'
-import { Zap, TowerControl, Cable, Network, RadioTower, ClipboardList, ArrowRight } from 'lucide-react'
+import { Cable, TowerControl, Lightbulb, Waves, Layers, Wrench } from 'lucide-react'
 import RevealHeading from './RevealHeading'
 import { useFadeVariants, VIEWPORT_ONCE } from '../lib/motion'
 
 const services = [
   {
-    icon: Zap,
-    title: 'Enerji İletim Hatları',
-    desc: 'Yüksek gerilim direği ve iletim hattı projelerini etütten devreye almaya kadar uçtan uca yürütüyoruz.',
+    icon: Cable,
+    title: 'Kablo Kanal Kazısı & Kablo Serimi',
+    desc: 'OG ve AG kabloları için kanal kazısı, kanalın borulanması, kabloların çekilmesi ve eklerinin yapılması. Galeri içi çekimler dahil.',
   },
   {
     icon: TowerControl,
-    title: 'Trafo Merkezleri',
-    desc: 'Dağıtım ve indirici trafo merkezlerinin inşasını, elektromekanik montajını ve devreye alma testlerini üstleniyoruz.',
+    title: 'Trafo Temeli & Trafo Binası',
+    desc: 'Dağıtım ve indirici merkezler için trafo temeli imalatı, trafo binası inşaatı ve saha çevresinin tel fensle çevrilmesi.',
   },
   {
-    icon: Cable,
-    title: 'Fiber Optik Altyapı',
-    desc: 'Yeraltı ve hava hattı fiber optik kablo döşeme, ek yapımı ve saha ölçümlerinde uzman ekiplerle hizmet veriyoruz.',
+    icon: Lightbulb,
+    title: 'Aydınlatma Direkleri',
+    desc: 'Yol ve refüj aydınlatmalarında direk temeli yapımı, direklerin dikimi, kabloların çekilip irtibatlandırılması.',
   },
   {
-    icon: Network,
-    title: 'Telekom Şebeke Kurulumu',
-    desc: 'Baz istasyonu bağlantıları ve şebeke düğüm noktalarının kurulumunu planlıyor, sahada uyguluyoruz.',
+    icon: Waves,
+    title: 'Boru, Drenaj & Pissu Hatları',
+    desc: 'Atık su ve yağmur suyu hatlarının açılması ve deplasesi, betonarme rögar imalatı, PVC ve HDPE boruların alın kaynaklı montajı.',
   },
   {
-    icon: RadioTower,
-    title: 'Saha Bakımı & Arıza Müdahalesi',
-    desc: 'Mevcut enerji ve telekom hatlarında periyodik bakım, arıza tespiti ve onarım hizmeti sağlıyoruz.',
+    icon: Layers,
+    title: 'Üst Yapı Restorasyonu',
+    desc: 'Kanal kapatıldıktan sonra beton, asfalt ve parke kaplamanın eski haline getirilmesi; kaldırım ve bordür imalatı.',
   },
   {
-    icon: ClipboardList,
-    title: 'Proje Yönetimi',
-    desc: 'Etütten devreye almaya kadar tüm süreçleri planlama, saha koordinasyonu ve raporlama ile yönetiyoruz.',
+    icon: Wrench,
+    title: 'Arıza Müdahalesi & Bakım',
+    desc: 'Arızalı kabloların tespiti, kanal kazısı ve yeni kablo serimi. TEDAŞ metropol alanında 1996’dan bu yana kesintisiz sürüyor.',
   },
 ]
 
@@ -54,12 +54,12 @@ export default function Services() {
           </motion.div>
           <RevealHeading
             as="h2"
-            lines={['Altyapıda Uzmanlık Alanlarımız']}
+            lines={['Yaptığımız İmalatlar']}
             className="font-display text-4xl lg:text-5xl font-black tracking-tight mt-5 leading-[1.05]"
             style={{ color: 'var(--text)' }}
           />
           <motion.p variants={fade.body} className="text-base lg:text-lg mt-5" style={{ color: 'var(--text-soft)' }}>
-            Enerji iletimi ve telekom şebekesinde uzmanlaşmış ekibimizle sahada çözüm üretiyoruz.
+            Kazıdan üst kaplamaya kadar işin tamamını kendi ekibimiz ve kendi makine parkımızla yürütüyoruz.
           </motion.p>
         </motion.div>
 
@@ -96,13 +96,6 @@ export default function Services() {
               <p className="text-sm leading-relaxed flex-1" style={{ color: 'var(--text-soft)' }}>
                 {s.desc}
               </p>
-              {/* --accent is now the single verified role for small text on
-                  --bg/--surface (index.css §ACCENT) — no separate "strong"
-                  variant needed here. */}
-              <div className="flex items-center gap-1.5 text-sm font-semibold mt-6 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" style={{ color: 'var(--accent)' }}>
-                Detaylı Bilgi
-                <ArrowRight size={14} aria-hidden="true" />
-              </div>
             </motion.div>
           ))}
         </motion.div>

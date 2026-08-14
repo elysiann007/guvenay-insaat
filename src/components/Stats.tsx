@@ -1,14 +1,16 @@
 import { useEffect, useRef } from 'react'
 import { motion, useInView, useMotionValue, animate, useTransform, useReducedMotion } from 'framer-motion'
-import { Award, Zap, TowerControl, Cable } from 'lucide-react'
+import { Award, ClipboardList, Building2, Truck } from 'lucide-react'
 import RevealHeading from './RevealHeading'
 import { DURATION, EASE_OUT_EXPO, useFadeVariants, VIEWPORT_ONCE } from '../lib/motion'
 
+// Dördü de firmanın kendi referans dosyasından sayılabilir rakamlar —
+// tahmin ya da yuvarlama değil.
 const stats = [
-  { value: 30, suffix: '+', label: 'Yıl Deneyim', desc: "1994'ten bu yana sektördeyiz", icon: Award },
-  { value: 1250, suffix: '+', label: 'Km İletim Hattı', desc: 'Enerji nakil hatlarında tamamlanan uzunluk', icon: Zap },
-  { value: 85, suffix: '+', label: 'Trafo Merkezi & Saha', desc: "Türkiye'nin çeşitli bölgelerinde", icon: TowerControl },
-  { value: 3200, suffix: '+', label: 'Km Fiber Altyapı', desc: 'Telekom şebekesine döşenen fiber hat', icon: Cable },
+  { value: 32, suffix: '+', label: 'Yıl Deneyim', desc: "1994'ten bu yana altyapı imalatı", icon: Award },
+  { value: 200, suffix: '+', label: 'Tamamlanan İş', desc: '1995–2026 referans listemizden', icon: ClipboardList },
+  { value: 30, suffix: '+', label: 'Kurumsal Müşteri', desc: 'TEDAŞ, ESBAŞ ve sanayi kuruluşları', icon: Building2 },
+  { value: 15, suffix: '+', label: 'İş Makinesi', desc: 'Ekskavatör, kamyon ve nakliye parkı', icon: Truck },
 ]
 
 function CountUp({ target, suffix }: { target: number; suffix: string }) {
@@ -63,7 +65,7 @@ export default function Stats() {
           <span className="eyebrow eyebrow-on-dark">Rakamlarla Güvenay</span>
           <RevealHeading
             as="h2"
-            lines={['30 Yıldır Güvenle Altyapı Kuruyoruz']}
+            lines={['32 Yıldır Sahada Altyapı Kuruyoruz']}
             className="font-display text-3xl lg:text-4xl font-black tracking-tight mt-5 leading-[1.05] text-white"
           />
         </motion.div>

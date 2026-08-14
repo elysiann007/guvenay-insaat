@@ -1,16 +1,26 @@
 import { useId, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Phone, Mail, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react'
+import { MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react'
 import RevealHeading from './RevealHeading'
 import { useFadeVariants, VIEWPORT_ONCE, useTapFeedback } from '../lib/motion'
 
+// Telefon/e-posta satırları firmadan doğrulanmış bilgi gelene kadar burada
+// YOK — uydurma numara yayınlamaktansa yalnızca formu göstermek doğru.
+// Bkz. docs/EKSIK-BILGILER.md.
 const info = [
-  { icon: Phone, label: 'Telefon', value: '+90 (212) 555 0100', sub: 'Hafta içi 09:00 - 18:00', href: 'tel:+902125550100' },
-  { icon: Mail, label: 'E-posta', value: 'info@guvenayinsaat.com.tr', sub: '24 saat içinde yanıt', href: 'mailto:info@guvenayinsaat.com.tr' },
-  { icon: MapPin, label: 'Adres', value: 'Maslak Mah. No: 42, İstanbul', sub: 'Sarıyer / İstanbul', href: undefined },
+  { icon: MapPin, label: 'Çalışma Bölgesi', value: 'İzmir ve Ege Bölgesi', sub: 'Metropol, OSB ve serbest bölge sahaları', href: undefined },
+  { icon: Clock, label: 'Saha Saatleri', value: 'Hafta içi 08:00 – 18:00', sub: 'Arıza müdahalelerinde gece çalışması dahil', href: undefined },
 ]
 
-const projectTypes = ['Enerji İletim Hattı', 'Trafo Merkezi', 'Fiber Optik', 'Telekom Şebekesi', 'Bakım & Onarım', 'Diğer']
+const projectTypes = [
+  'Kablo Kanal Kazısı & Kablo Serimi',
+  'Trafo Temeli / Trafo Binası',
+  'Aydınlatma Direği',
+  'Boru, Drenaj & Pissu Hattı',
+  'Üst Yapı Restorasyonu',
+  'Arıza Müdahalesi & Bakım',
+  'Diğer',
+]
 
 type FieldName = 'name' | 'email' | 'phone' | 'message'
 
@@ -38,7 +48,7 @@ function validateField(name: FieldName, value: string): string {
 }
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', type: 'Enerji İletim Hattı' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', type: projectTypes[0] })
   const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({})
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({})
   const [sent, setSent] = useState(false)
@@ -140,13 +150,13 @@ export default function Contact() {
                   <motion.div key={item.label} variants={fade.item}>
                     <Wrapper
                       {...(item.href ? { href: item.href } : {})}
-                      className="group flex gap-5 py-5 hairline-top last:hairline-bottom cursor-pointer"
+                      className={`group flex gap-5 py-5 hairline-top last:hairline-bottom${item.href ? ' cursor-pointer' : ''}`}
                       style={{ display: 'flex' }}
                     >
                       <item.icon size={19} className="shrink-0 mt-1" style={{ color: 'var(--accent)' }} aria-hidden="true" />
                       <div className="min-w-0">
                         <div className="text-[11px] font-bold uppercase tracking-[0.16em]" style={{ color: 'var(--text-dim)' }}>{item.label}</div>
-                        <div className="text-sm lg:text-base font-bold mt-1 break-words transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text)' }}>{item.value}</div>
+                        <div className={`text-sm lg:text-base font-bold mt-1 break-words${item.href ? ' transition-colors group-hover:text-[var(--accent)]' : ''}`} style={{ color: 'var(--text)' }}>{item.value}</div>
                         <div className="text-xs mt-0.5" style={{ color: 'var(--text-soft)' }}>{item.sub}</div>
                       </div>
                     </Wrapper>
@@ -189,7 +199,7 @@ export default function Contact() {
                     whileTap={tapFeedback}
                     onClick={() => {
                       setSent(false)
-                      setForm({ name: '', email: '', phone: '', message: '', type: 'Enerji İletim Hattı' })
+                      setForm({ name: '', email: '', phone: '', message: '', type: projectTypes[0] })
                       setTouched({})
                       setErrors({})
                     }}

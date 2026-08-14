@@ -30,10 +30,17 @@ export default function Hero() {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
   const videoScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1, 1.18])
 
-  // The background video is only 720p — blown up to fill a tall phone screen it looks
-  // soft and badly cropped. On phones/tablets we show the sharp 2048px poster image
-  // instead, and only load/play the video on desktop where it fits the 16:9 frame.
-  const [isDesktop, setIsDesktop] = useState(false)
+  // The site video is a 478x850 phone clip of the makine parkı — at that width it
+  // only holds up inside a portrait phone frame, so it plays on mobile only. On
+  // desktop we show the sharp 1920px night-works photograph instead, which is the
+  // one that survives being stretched across a wide viewport.
+  // Seeded synchronously from the media query, not defaulted to false: with a
+  // false default the mobile branch mounts for one frame on desktop too, and
+  // the browser has already begun fetching the 1.1MB video by the time the
+  // effect corrects it. Measured — the request shows up in the network log.
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches
+  )
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)')
     const update = () => setIsDesktop(mq.matches)
@@ -44,45 +51,81 @@ export default function Hero() {
 
   return (
     <section id="hero" ref={sectionRef} className="relative min-h-svh flex flex-col overflow-hidden" style={{ background: 'var(--ink)' }}>
-      {/* Background: sharp poster image on mobile, parallax video on desktop.
-          PLACEHOLDER NOTICE: hero-altyapi-placeholder.webp is an AI-generated
-          stand-in (power transmission towers at golden hour) used as both the
-          mobile background and the video poster frame. It is not a photograph
-          of the company's own work and must be swapped for real site
-          photography before launch. */}
+      {/* Background: parallax site photograph on desktop, portrait yard clip on
+          mobile. Both are the company's own material — no stock, no stand-ins. */}
       {isDesktop ? (
-        <motion.video
-          className="absolute inset-0 w-full h-full object-cover"
+        <motion.img
+          className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ scale: videoScale }}
-          src="/media/hero.mp4"
-          poster="/media/hero-altyapi-placeholder.webp"
+          src="/media/hero.webp"
+          alt=""
+          aria-hidden="true"
+        />
+      ) : (
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/media/hero-mobile.mp4"
+          poster="/media/hero-mobile-poster.webp"
           autoPlay
           muted
           loop
           playsInline
           aria-hidden="true"
         />
-      ) : (
-        <img
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          src="/media/hero-altyapi-placeholder.webp"
-          alt="Temsili görsel — enerji nakil hatları, gün batımı (yapay zekâ ile üretilmiş yer tutucu, saha fotoğrafı değildir)"
-          aria-hidden="true"
-        />
       )}
-      {/* Readability scrim — tinted from --ink so it retones automatically per theme */}
+      {/* === READABILITY SCRIM ===
+          Stops are contrast-derived, not aesthetic. They were measured by
+          compositing the real image pixels under the real gradient alpha and
+          scanning each element's bounding box for its worst-case (brightest)
+          backdrop pixel — not eyeballed, and not assumed from the photo's
+          average brightness, which is misleading here.
+
+          Two scrims, because the two breakpoints have different problems.
+
+          MOBILE: the copy runs full width over the yard video, so the scrim
+          has to be uniform and it has to be heavy. The eyebrow is
+          --accent-on-dark gold sitting on blown-out daylight sky, raw
+          (255,250,236); gold needs alpha 0.73 there to clear AA where white
+          would need only 0.58. That is why the gradient RISES toward the top
+          rather than falling. Do not lighten these to "let the sky show"
+          without first moving the hero eyebrow off gold.
+
+          DESKTOP: the copy is confined to the left grid column, so darkening
+          the full frame was overkill — it was flattening the machinery and
+          barriers on the right, which is the half of the photograph actually
+          worth showing. A single flat 64% wash was the price of protecting a
+          streetlight highlight at raw (252,255,255) sitting behind the h1 on
+          the LEFT. So the desktop scrim is split: a light vertical wash over
+          the whole frame, plus a horizontal one that only loads the left
+          column.
+
+          Measured after the split (worst-case pixel per element box, image
+          composited under both layers at 1272x853):
+            alpha behind h1 0.703 (was a flat 0.64) — right third 0.316,
+            so the machinery reads at roughly twice its previous value
+            h1 6.29 · eyebrow 11.16 · sub-copy 8.50 · btn-on-dark 17.16
+            · glass tag 15.88 — all clear AA, h1 by 2x its 3:1 large-text bar.
+
+          Method, if either layer changes: replicate object-cover into the hero
+          box, evaluate BOTH gradients per pixel and composite them
+          multiplicatively (1 - product of inverses), blend over the image, then
+          scan each element's bounding box for its brightest backdrop pixel and
+          measure against the element's own colour. Sampling the average
+          brightness instead will pass a hero that fails on one blown highlight. */}
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none lg:hidden"
         style={{
           background:
-            // Scrim stops are contrast-derived, not aesthetic. Sampled against
-            // the actual hero image (object-cover crop) at 390x844: with the
-            // previous 88/35/15/45 the sub-copy measured 2.71 against the
-            // brightest pixel behind it even at full white, and .btn-on-dark
-            // sat at 4.45. These stops are the LIGHTEST set that clears AA for
-            // every hero element (sub-copy 4.99, btn-on-dark 6.67, h1 5.56).
-            // Re-measure before lightening — the sky in this image is bright.
-            'linear-gradient(to top, color-mix(in srgb, var(--ink) 90%, transparent) 0%, color-mix(in srgb, var(--ink) 58%, transparent) 40%, color-mix(in srgb, var(--ink) 38%, transparent) 65%, color-mix(in srgb, var(--ink) 55%, transparent) 100%)',
+            'linear-gradient(to top, color-mix(in srgb, var(--ink) 86%, transparent) 0%, color-mix(in srgb, var(--ink) 70%, transparent) 30%, color-mix(in srgb, var(--ink) 64%, transparent) 55%, color-mix(in srgb, var(--ink) 74%, transparent) 72%, color-mix(in srgb, var(--ink) 82%, transparent) 100%)',
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none hidden lg:block"
+        style={{
+          background: [
+            'linear-gradient(to right, color-mix(in srgb, var(--ink) 62%, transparent) 0%, color-mix(in srgb, var(--ink) 54%, transparent) 42%, transparent 74%)',
+            'linear-gradient(to top, color-mix(in srgb, var(--ink) 78%, transparent) 0%, color-mix(in srgb, var(--ink) 34%, transparent) 35%, color-mix(in srgb, var(--ink) 30%, transparent) 60%, color-mix(in srgb, var(--ink) 44%, transparent) 100%)',
+          ].join(', '),
         }}
       />
 
@@ -110,14 +153,19 @@ export default function Hero() {
       >
         <div>
           <motion.div custom={0.15} variants={fadeUp} initial="hidden" animate="visible">
-            <span className="eyebrow eyebrow-on-dark">1994'ten beri güveninizle</span>
+            <span className="eyebrow eyebrow-on-dark">1994'ten beri altyapı imalatı</span>
           </motion.div>
 
           <RevealHeading
             as="h1"
             eager
             delay={0.24}
-            lines={['Hatları ve Şebekeleri', 'Güvenle Kuruyoruz']}
+            // Ölçüldü (1280x800, --text-h1 = 9vw = 115px, lg grid sütunu 584px):
+            // sütun bu punto için dar, her satır kendi içinde tekrar sarıyor.
+            // Bu iki satır toplam 3 görsel satır (422px) tutuyor — eski
+            // "Hatları ve Şebekeleri / Güvenle Kuruyoruz" 4 satır/562px idi.
+            // Daha uzun bir satır eklemeden önce burada yeniden ölç.
+            lines={['Altyapıyı Güvenle', 'Kuruyoruz']}
             className="font-display text-h1 font-black text-white max-w-4xl mt-5"
           />
 
@@ -131,9 +179,9 @@ export default function Hero() {
             // measured 3.97 against the brightest backdrop pixel (needs 4.5).
             style={{ color: '#fff' }}
           >
-            30 yılı aşkın deneyimle enerji iletim hatları, trafo merkezleri ve
-            fiber optik/telekom şebeke altyapısını Türkiye'nin dört bir yanında
-            zamanında ve eksiksiz hayata geçiriyoruz.
+            32 yıldır İzmir ve Ege bölgesinde OG/AG kablo kanal kazısı, kablo
+            serimi, trafo temelleri, borulama ve üst yapı restorasyonu yapıyoruz.
+            Taahhüt ettiğimiz imalatı, taahhüt ettiğimiz sürede eksiksiz bitiriyoruz.
           </motion.p>
 
           <motion.div
@@ -174,7 +222,7 @@ export default function Hero() {
           className="liquid-glass border border-white/20 px-6 py-3 rounded-xl w-fit mt-4 lg:mt-0 lg:justify-self-end"
         >
           <p className="text-lg md:text-xl lg:text-2xl font-light text-white">
-            Enerji. Telekom. Şebeke.
+            Kazı. Boru. Kablo.
           </p>
         </motion.div>
       </div>

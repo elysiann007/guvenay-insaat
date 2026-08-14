@@ -6,23 +6,23 @@ import { useFadeVariants, VIEWPORT_ONCE } from '../lib/motion'
 const steps = [
   {
     num: '01',
-    title: 'Etüt & Keşif',
-    desc: 'Güzergahı ve sahayı inceler, mevcut altyapıyı değerlendirip projenize özel uygulama planını çıkarırız.',
+    title: 'Keşif & Güzergah Etüdü',
+    desc: 'Sahayı geziyor, mevcut altyapının kotlarını ve çakışmalarını tespit ediyor, kazı güzergahını ve iş programını birlikte netleştiriyoruz.',
   },
   {
     num: '02',
-    title: 'Proje & Mühendislik',
-    desc: 'Mühendislik ekibimiz elektriksel hesaplamaları, güzergah projelerini ve teknik çizimleri hazırlar.',
+    title: 'Kazı & Kanal Açımı',
+    desc: 'Trafik ve yaya güvenliğini bariyerlerle aldıktan sonra kanalı kendi makine parkımızla açıyoruz; gerektiğinde gece çalışıyoruz.',
   },
   {
     num: '03',
-    title: 'Saha Uygulaması',
-    desc: 'Direk dikimi, kablo çekimi, trafo montajı ve fiber döşeme işlerini uzman saha ekiplerimizle yürütürüz.',
+    title: 'Borulama & Kablo Serimi',
+    desc: 'Kanalı kumluyor, boruları takozlar üzerine diziyor, rögarları yerleştiriyor ve kabloları çekip eklerini yapıyoruz.',
   },
   {
     num: '04',
-    title: 'Test & Devreye Alma',
-    desc: 'Elektriksel testleri ve ölçümleri tamamlayıp hattı ya da şebekeyi devreye alarak teslim ederiz.',
+    title: 'Üst Kaplama & Teslim',
+    desc: 'Kanalı kapatıp beton, asfalt ya da parke kaplamayı eski haline getiriyor, sahayı temiz teslim ediyoruz.',
   },
 ]
 
@@ -52,12 +52,12 @@ export default function Process() {
             </motion.div>
             <RevealHeading
               as="h2"
-              lines={['Etütten Devreye Almaya 4 Adım']}
+              lines={['Keşiften Teslime 4 Adım']}
               className="font-display text-h2 font-extrabold mt-5"
               style={{ color: 'var(--text)' }}
             />
             <motion.p variants={fade.body} className="text-base lg:text-lg leading-relaxed mt-5" style={{ color: 'var(--text-soft)' }}>
-              Şeffaf, sistematik ve saha odaklı sürecimizle her adımda yanınızdayız.
+              Kazıyı açan ekiple üst kaplamayı yapan ekip aynı; işi taşerona devretmiyoruz.
             </motion.p>
             <motion.div variants={fade.media} className="mt-10 hidden lg:block">
               {/* Clipping wrapper — parallax transform must never escape it */}
@@ -65,7 +65,7 @@ export default function Process() {
                 <motion.div style={{ y: imgY, scale: 1.16, willChange: imgInView ? 'transform' : 'auto' }}>
                   <img
                     src="/media/process.webp"
-                    alt="Temsili görsel — proje çizimleri ve saha planlaması"
+                    alt="Dar bir sokakta kanal kazısı — paletli mini ekskavatör, hafriyat kamyonu ve trafik bariyerleri"
                     className="img-tone w-full object-cover"
                     style={{ aspectRatio: '4/3' }}
                     loading="lazy"

@@ -323,9 +323,21 @@
     z-index: -1;
   }
 
-  /* === IMAGE TREATMENT — muted grayscale that blooms to full color on hover === */
+  /* === IMAGE TREATMENT ===
+     The resting state was grayscale(55%), released only on :hover /
+     :focus-within. That made the photography effectively unreachable for the
+     majority of this site's audience: :hover never fires on touch, and the
+     project cards carried no focusable child, so :focus-within could not fire
+     either. Every mobile and keyboard visitor saw every site photograph at 55%
+     grey, permanently — on a page whose only distinguishing asset IS that
+     photography.
+     The resting grade is now 12%: enough to keep six phone snapshots reading
+     as one set rather than a scrapbook, not enough to hide them. Hover is a
+     small bloom on top, an enhancement rather than the only way to see the
+     image at all. Do not push the resting value back up without giving touch
+     and keyboard users another way to reach full colour. */
   .img-tone {
-    filter: grayscale(55%) contrast(1.04) brightness(0.97);
+    filter: grayscale(12%) contrast(1.02) brightness(0.99);
     transform: scale(1);
     transition: filter 0.4s ease-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }

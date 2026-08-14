@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { Menu, X, Phone } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { DURATION, EASE_OUT_EXPO, useTapFeedback } from '../lib/motion'
 
 const links = [
@@ -142,16 +142,9 @@ export default function Navbar() {
 
             {/* CTA + hamburger — gap-2 (8px) keeps adjacent tap targets spaced */}
             <div className="flex items-center gap-2">
-              <a
-                href="tel:+902125550100"
-                className={`hidden md:flex lg:hidden items-center gap-2 text-sm font-semibold rounded-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 ${
-                  onDark ? 'text-white focus-visible:outline-white' : 'text-[var(--text)] focus-visible:outline-[var(--accent)]'
-                }`}
-              >
-                <Phone size={15} className={onDark ? 'text-white' : 'text-[var(--accent)]'} />
-                (212) 555 0100
-              </a>
-
+              {/* Doğrulanmış telefon numarası gelene kadar tel: kısayolu yok —
+                  bkz. docs/EKSIK-BILGILER.md. Numara gelince buraya bir
+                  <a href="tel:…"> geri konacak. */}
               <motion.button
                 whileTap={tapFeedback}
                 onClick={() => handleNav('#contact')}
@@ -219,10 +212,6 @@ export default function Navbar() {
               transition={{ delay: reduceMotion ? 0 : 0.2, duration: reduceMotion ? 0 : 0.3 }}
               className="mt-auto pt-8 flex flex-col gap-3"
             >
-              <motion.a whileTap={tapFeedback} href="tel:+902125550100" className="btn-secondary w-full">
-                <Phone size={16} />
-                (212) 555 0100
-              </motion.a>
               <motion.button whileTap={tapFeedback} onClick={() => handleNav('#contact')} className="btn-primary w-full">
                 Ücretsiz Teklif Al
               </motion.button>

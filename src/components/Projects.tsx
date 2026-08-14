@@ -1,82 +1,94 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence, LayoutGroup, useReducedMotion } from 'framer-motion'
-import { MapPin, Calendar } from 'lucide-react'
+import { MapPin, Calendar, Maximize2 } from 'lucide-react'
 import RevealHeading from './RevealHeading'
+import Lightbox from './Lightbox'
 import { DURATION, EASE_OUT_EXPO, VIEWPORT_ONCE, useTapFeedback } from '../lib/motion'
 
-type Category = 'Tümü' | 'Enerji' | 'Telekom' | 'Şebeke'
+type Category = 'Tümü' | 'Kablo & Kanal' | 'Trafo & Direk' | 'Boru & Altyapı'
 
-// Görseller mevcut placeholder fotoğraflardır (ALTYAPI-PLAN.md — "Görseller"
-// kararı); proje adları demo enerji/telekom içerikleridir ama alt metinleri
-// fotoğrafın gerçekte ne gösterdiğini dürüstçe tarif eder, projenin iddia
-// ettiği şeyi değil.
+// İşler firmanın kendi referans dosyasından (docs/) birebir alınmıştır.
+// Fotoğraflar firmanın kendi saha arşivinden gelir; her kart o işin kendi
+// fotoğrafı olmayabileceği için `alt` metni fotoğrafın gerçekte ne
+// gösterdiğini tarif eder, kartın başlığını tekrar etmez.
 const projects = [
   {
     id: 1,
-    name: 'Ataşehir Enerji Nakil Hattı',
-    location: 'Ataşehir, İstanbul',
-    year: '2024',
-    category: 'Enerji' as Category,
-    units: '48 km Hat',
+    name: 'ESBAŞ — Sadi TR / Döhler Enerji Hattı',
+    location: 'Gaziemir, İzmir',
+    year: '2025',
+    category: 'Kablo & Kanal' as Category,
+    units: 'Kazı + Asfalt',
     img: '/media/project-1.webp',
-    alt: 'Temsili görsel — modern bina cephesi ve peyzajlı avlu',
+    alt: 'Kablo kanalı kapatıldıktan sonra yeniden asfaltlanmış dar sokak',
   },
   {
     id: 2,
-    name: 'Çankaya Trafo Merkezi',
-    location: 'Çankaya, Ankara',
-    year: '2023',
-    category: 'Enerji' as Category,
-    units: '2×40 MVA',
+    name: 'TEDAŞ — Metropol Arıza Müdahalesi',
+    location: 'İzmir Metropol',
+    year: '1996 – 2026',
+    category: 'Kablo & Kanal' as Category,
+    units: '30 Yıldır Kesintisiz',
     img: '/media/project-2.webp',
-    alt: 'Temsili görsel — cam giydirme cepheli bina',
+    alt: 'Gece çalışması — trafiğe kapatılmış yolda bariyerler ve iş makineleri',
   },
   {
     id: 3,
-    name: 'Bornova Fiber Şebeke Genişletmesi',
-    location: 'Bornova, İzmir',
-    year: '2023',
-    category: 'Şebeke' as Category,
-    units: '120 km Fiber',
+    name: 'GÜLER ELK. — Aliağa OSB, ADM 1 / ADM 2',
+    location: 'Aliağa, İzmir',
+    year: '2020',
+    category: 'Kablo & Kanal' as Category,
+    units: '32 km OG + Fiber',
     img: '/media/project-3.webp',
-    alt: 'Temsili görsel — kavisli beyaz cepheli modern yapı',
+    alt: 'Saha ekibi kırmızı kablo makarasından kablo çekerken',
   },
   {
     id: 4,
-    name: 'Nilüfer Telekom Saha İstasyonu',
-    location: 'Nilüfer, Bursa',
-    year: '2022',
-    category: 'Telekom' as Category,
-    units: '18 Saha',
+    name: 'PUNTAYELİ — Trafo Temelleri',
+    location: 'Söke / Çeşme / Aliağa',
+    year: '2017',
+    category: 'Trafo & Direk' as Category,
+    units: '50 Tonluk Temel',
     img: '/media/project-4.webp',
-    alt: 'Temsili görsel — endüstriyel tesis binası',
+    alt: 'Direk dibine kurulmuş ahşap kalıp ve dökülmüş beton temel',
   },
   {
     id: 5,
-    name: 'Konyaaltı Enerji İletim Bağlantısı',
-    location: 'Konyaaltı, Antalya',
-    year: '2022',
-    category: 'Enerji' as Category,
-    units: '32 km Hat',
+    name: 'TEDAŞ — Havai Hat Direk Dibi Betonlama',
+    location: 'İzmir – Manisa',
+    year: '2020 – 2022',
+    category: 'Trafo & Direk' as Category,
+    units: '180 Direk',
     img: '/media/project-5.webp',
-    alt: 'Temsili görsel — deniz kenarında bina',
+    alt: 'Tamamlanmış kaldırım kaplaması ve dibi betonlanmış aydınlatma direkleri',
   },
   {
     id: 6,
-    name: 'Başakşehir Şebeke Altyapı Projesi',
-    location: 'Başakşehir, İstanbul',
-    year: '2021',
-    category: 'Şebeke' as Category,
-    units: '65 km Kablo',
+    name: 'BASBAŞ — TM / Doğalgaz İstasyonu Hattı',
+    location: 'Bergama, İzmir',
+    year: '2025',
+    category: 'Boru & Altyapı' as Category,
+    units: 'Kanal + Boru',
     img: '/media/project-6.webp',
-    alt: 'Temsili görsel — bahçeli modern yapı kompleksi',
+    alt: 'Şehir içi cadde kenarında açılmış kanal, paletli ekskavatör ve reflektif yelekli saha ekibi',
   },
 ]
 
-const categories: Category[] = ['Tümü', 'Enerji', 'Telekom', 'Şebeke']
+const categories: Category[] = ['Tümü', 'Kablo & Kanal', 'Trafo & Direk', 'Boru & Altyapı']
 
-function ProjectCard({ project, featured, index }: { project: typeof projects[0]; featured: boolean; index: number }) {
+function ProjectCard({
+  project,
+  featured,
+  index,
+  onOpen,
+}: {
+  project: typeof projects[0]
+  featured: boolean
+  index: number
+  onOpen: (id: number, trigger: HTMLButtonElement) => void
+}) {
   const reduceMotion = useReducedMotion()
+  const btnRef = useRef<HTMLButtonElement>(null)
   return (
     <motion.div
       layout={!reduceMotion}
@@ -117,6 +129,29 @@ function ProjectCard({ project, featured, index }: { project: typeof projects[0]
           {project.category}
         </div>
 
+        {/* Enlarge affordance — the card lifts and shadows on hover, so it has
+            to actually say what the click does. */}
+        <div
+          className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200"
+          style={{ background: 'color-mix(in srgb, var(--ink) 72%, transparent)', color: '#fff' }}
+          aria-hidden="true"
+        >
+          <Maximize2 size={15} />
+        </div>
+
+        {/* Stretched control. Deliberately a sibling overlay rather than a
+            wrapper around the caption: it keeps the <h3> a real heading in the
+            a11y tree, gives the card exactly one tab stop, and — because it
+            lives inside .group — finally lets `.group:focus-within` fire, which
+            is what releases the .img-tone grayscale for keyboard users. */}
+        <button
+          ref={btnRef}
+          type="button"
+          onClick={() => btnRef.current && onOpen(project.id, btnRef.current)}
+          aria-label={`${project.name} — fotoğrafı büyüt`}
+          className="absolute inset-0 z-10 w-full h-full cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[var(--accent-on-dark)]"
+        />
+
         {/* Caption overlay — sits on the image, editorial gallery style */}
         <div className="absolute inset-x-0 bottom-0 p-5 lg:p-6 translate-y-1.5 group-hover:translate-y-0 transition-transform duration-500">
           <h3
@@ -144,6 +179,32 @@ export default function Projects() {
   const tapFeedback = useTapFeedback()
   const reduceMotion = useReducedMotion()
 
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
+
+  const openLightbox = useCallback(
+    (id: number, trigger: HTMLButtonElement) => {
+      triggerRef.current = trigger
+      setLightboxIndex(filtered.findIndex((p) => p.id === id))
+    },
+    [filtered]
+  )
+
+  // Return focus to the card that opened the dialog, not to <body> — a
+  // keyboard user who closes the viewer should be exactly where they were.
+  const closeLightbox = useCallback(() => {
+    setLightboxIndex(null)
+    triggerRef.current?.focus()
+    triggerRef.current = null
+  }, [])
+
+  const selectCategory = (cat: Category) => {
+    // Indices address the filtered array, so a filter change while the
+    // viewer is open would point at the wrong project.
+    setLightboxIndex(null)
+    setActive(cat)
+  }
+
   return (
     <section id="projects" className="relative py-20 lg:py-32" style={{ background: 'var(--bg-alt)' }}>
       <div className="max-w-7xl mx-auto px-5 lg:px-8">
@@ -156,10 +217,10 @@ export default function Projects() {
           className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-12 lg:mb-16"
         >
           <div>
-            <span className="eyebrow">Referanslarımız</span>
+            <span className="eyebrow">Sahadan</span>
             <RevealHeading
               as="h2"
-              lines={['Tamamlanan Projeler']}
+              lines={['Seçilmiş İşlerimiz']}
               className="font-display text-4xl lg:text-5xl font-black tracking-tight mt-5 leading-[1.05]"
               style={{ color: 'var(--text)' }}
             />
@@ -171,7 +232,7 @@ export default function Projects() {
               <motion.button
                 key={cat}
                 whileTap={tapFeedback}
-                onClick={() => setActive(cat)}
+                onClick={() => selectCategory(cat)}
                 aria-pressed={active === cat}
                 className="relative shrink-0 min-h-11 min-w-11 flex items-end justify-center pb-2 text-sm font-bold uppercase tracking-[0.1em] cursor-pointer transition-colors duration-200"
                 style={{ color: active === cat ? 'var(--text)' : 'var(--text-dim)' }}
@@ -194,12 +255,24 @@ export default function Projects() {
           >
             <AnimatePresence mode="popLayout">
               {filtered.map((p, i) => (
-                <ProjectCard key={p.id} project={p} featured={i === 0} index={i} />
+                <ProjectCard
+                  key={p.id}
+                  project={p}
+                  /* Pinned to one project, not to `i === 0`. With the old
+                     index test every filter promoted whatever landed first,
+                     so "Boru & Altyapı" (one match) rendered a lone
+                     2x2 tile marooned in a 3-column grid. */
+                  featured={p.id === projects[0].id}
+                  index={i}
+                  onOpen={openLightbox}
+                />
               ))}
             </AnimatePresence>
           </motion.div>
         </LayoutGroup>
       </div>
+
+      <Lightbox items={filtered} index={lightboxIndex} onClose={closeLightbox} onNavigate={setLightboxIndex} />
     </section>
   )
 }

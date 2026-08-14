@@ -7,7 +7,7 @@ import About from './components/About'
 import Services from './components/Services'
 import Projects from './components/Projects'
 import Stats from './components/Stats'
-import Testimonials from './components/Testimonials'
+import References from './components/References'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 
@@ -22,7 +22,7 @@ export default function App() {
         <Services />
         <Projects />
         <Stats />
-        <Testimonials />
+        <References />
         <Contact />
       </main>
       <Footer />

@@ -5,18 +5,19 @@ import RevealHeading from './RevealHeading'
 import { useFadeVariants, VIEWPORT_ONCE } from '../lib/motion'
 
 const values = [
-  { icon: Shield, label: 'Güvenilirlik', desc: 'Her enerji ve telekom projesinde verdiğimiz sözü sahada karşılıyoruz.' },
-  { icon: Award, label: 'Mühendislik Kalitesi', desc: 'Enerji iletimi ve telekom altyapısında teknik standartlara uygun malzeme ve işçilik kullanıyoruz.' },
-  { icon: Users, label: 'Müşteri Odaklı', desc: 'İşletmenizin ihtiyacına uygun altyapı çözümünü birlikte tasarlıyoruz.' },
-  { icon: CheckCircle, label: 'Zamanında Devreye Alma', desc: 'Söz verdiğimiz sürede sahayı test edip devreye alıyoruz.' },
+  { icon: Shield, label: 'Sözümüzde Dururuz', desc: 'Firmayı kurarken destur edindiğimiz doğru buydu ve ilk günden bu yana değişmedi.' },
+  { icon: CheckCircle, label: 'Eksiksiz ve Zamanında', desc: 'Taahhüt ettiğimiz imalatı, taahhüt ettiğimiz sürede, kaliteden ödün vermeden bitiririz.' },
+  { icon: Award, label: 'Kendi Makine Parkımız', desc: 'Mini ekskavatörlerden hafriyat kamyonlarına kadar iş makineleri ve nakliye bizim; işi bekletmeyiz.' },
+  { icon: Users, label: 'Paydaşlarımızla', desc: 'Otuz yılı aşkın süredir bize omuz veren iş birliklerimizi yeni işlerin ufku olarak görüyoruz.' },
 ]
 
 const milestones = [
-  { year: '1994', title: 'Kuruluş', desc: "İstanbul'da küçük bir ekiple inşaat sektöründe temeller atıldı." },
-  { year: '2002', title: 'Büyüme', desc: '50+ çalışan ve enerji altyapısı alanındaki ilk büyük proje tamamlandı.' },
-  { year: '2010', title: 'Ulusal Genişleme', desc: "Türkiye'nin 10 ilinde enerji ve saha ekipleri aktif hale geldi." },
-  { year: '2018', title: 'Telekom Alanına Giriş', desc: 'Fiber optik ve telekom şebeke altyapısına yönelik yeni bir iş kolu kuruldu.' },
-  { year: '2024', title: 'Bugün', desc: '500+ proje ve onlarca saha ekibiyle enerji ve telekom altyapısında büyümeye devam ediyoruz.' },
+  { year: '1994', title: 'Kuruluş', desc: 'Altyapı imalatlarında büyüme hedefiyle yola çıktık. Elimizde traktörden bozma tek bir kazıcı-yükleyici vardı; çok ekmeğini yedik.' },
+  { year: '1996', title: 'TEDAŞ ile İlk İş', desc: 'İzmir metropol alanında kablo kanal kazıları başladı. Otuz yıl sonra bugün hâlâ aynı iş sürüyor.' },
+  { year: '2001', title: 'Trafo Binası İnşaatı', desc: 'Bandırma şehir şebekesi için 23 adet DAPT-2 ve bir adet DAPT-24 trafo binasının inşaatını üstlendik.' },
+  { year: '2011', title: 'ESBAŞ Gaziemir', desc: 'Serbest bölge içinde kesintisiz altyapı imalatı dönemi başladı; bölgedeki onlarca fabrikanın enerji ve altyapı hattını biz çektik.' },
+  { year: '2020', title: 'Aliağa OSB', desc: 'ADM 1 ile ADM 2 trafo binaları arasında galeriler içinden 32 km OG kablo ve aynı güzergahta fiber kablo çekimi.' },
+  { year: '2026', title: 'Bugün', desc: 'Genişleyen makine parkımız ve saha ekiplerimizle 32. yılımızda aynı işi yapıyoruz.' },
 ]
 
 export default function About() {
@@ -52,7 +53,7 @@ export default function About() {
               <motion.div style={{ y: imgY, scale: 1.16, willChange: imgInView ? 'transform' : 'auto' }}>
                 <img
                   src="/media/about.webp"
-                  alt="Temsili görsel — mühendislerin sahada proje çizimlerini incelemesi"
+                  alt="Açılmış kanalın içine beton takozlar üzerine yan yana dizilmiş çok sayıda koruge boru"
                   className="img-tone w-full object-cover"
                   style={{ aspectRatio: '3/4' }}
                   loading="lazy"
@@ -73,14 +74,20 @@ export default function About() {
             </motion.div>
             <RevealHeading
               as="h2"
-              lines={['Enerji ve Telekom Altyapısında Güvenilir Ortak']}
+              lines={['Bir Kazıcıyla Başladık,', '32 Yıldır Sapmadık']}
               className="font-display text-h2 font-extrabold mt-5"
               style={{ color: 'var(--text)' }}
             />
             <motion.p variants={fade.body} className="text-base lg:text-lg leading-relaxed mt-6" style={{ color: 'var(--text-soft)' }}>
-              1994'ten bu yana enerji iletim hatları, trafo merkezleri ve telekom/fiber altyapısında
-              yüzlerce proje tamamladık. Güven, mühendislik kalitesi ve saha disipliniyle her hattı
-              ve şebekeyi güvenle devreye alıyoruz.
+              1994'te firmamızı kurduğumuzda kendimize altyapı imalatları doğrultusunda büyümeyi
+              hedef koyduk; bugüne kadar da bu doğrultuda sapma yapmadık. O zamanlar traktörden
+              bozma bir kazıcı-yükleyiciye sahip olabilmek rüya gibi bir şeydi. Şimdi makine
+              parkımıza bakınca o tek makineyle ne kadar işin üstesinden gelmişiz, şaşıyoruz.
+            </motion.p>
+            <motion.p variants={fade.body} className="text-base lg:text-lg leading-relaxed mt-4" style={{ color: 'var(--text-soft)' }}>
+              İlk günden bu güne ekipler değişti, ekipmanlara ilaveler oldu. Değişmeyen tek şey,
+              firmayı kurarken destur edindiğimiz doğrular oldu: sözümüzde durmak ve taahhüt
+              ettiğimiz imalatları eksiksiz, zamanında, kaliteden ödün vermeden bitirmek.
             </motion.p>
 
             {/* Values as hairline-separated rows */}
@@ -107,7 +114,7 @@ export default function About() {
           className="max-w-3xl"
         >
           <motion.h3 variants={fade.eyebrow} className="font-display text-3xl lg:text-4xl font-black mb-10" style={{ color: 'var(--text)' }}>
-            30 Yıllık Hikayemiz
+            32 Yıllık Hikayemiz
           </motion.h3>
 
           <div className="relative">
