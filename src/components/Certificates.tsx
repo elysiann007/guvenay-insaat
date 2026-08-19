@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { X, ZoomIn } from 'lucide-react'
 
 const certificates = [
@@ -54,10 +54,61 @@ const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } }
 
 export default function Certificates() {
   const [active, setActive] = useState<(typeof certificates)[0] | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
+  const reduceMotion = useReducedMotion()
+
+  const openCertificate = (certificate: (typeof certificates)[0], trigger: HTMLButtonElement) => {
+    triggerRef.current = trigger
+    setActive(certificate)
+  }
+
+  const closeCertificate = () => setActive(null)
 
   useEffect(() => {
-    document.body.style.overflow = active ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    if (!active) return
+
+    const { body } = document
+    const root = document.getElementById('root')
+    const previousOverflow = body.style.overflow
+    const rootWasInert = root?.hasAttribute('inert') ?? false
+    body.style.overflow = 'hidden'
+    root?.setAttribute('inert', '')
+
+    const focusFrame = window.requestAnimationFrame(() => closeRef.current?.focus())
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setActive(null)
+        return
+      }
+      if (event.key !== 'Tab') return
+
+      const focusables = panelRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+      )
+      if (!focusables || focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const current = document.activeElement
+
+      if (event.shiftKey && (current === first || !panelRef.current?.contains(current))) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && current === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKey)
+    return () => {
+      window.cancelAnimationFrame(focusFrame)
+      document.removeEventListener('keydown', onKey)
+      body.style.overflow = previousOverflow
+      if (!rootWasInert) root?.removeAttribute('inert')
+    }
   }, [active])
 
   return (
@@ -91,7 +142,7 @@ export default function Certificates() {
             <motion.button
               key={c.id}
               variants={fadeUp}
-              onClick={() => setActive(c)}
+              onClick={(event) => openCertificate(c, event.currentTarget)}
               className="group cursor-pointer text-left"
               aria-label={`${c.title} — ${c.year} yılını büyük boyutta görüntüle`}
             >
@@ -129,22 +180,27 @@ export default function Certificates() {
       </div>
 
       {createPortal(
-        <AnimatePresence>
+        <AnimatePresence onExitComplete={() => triggerRef.current?.focus()}>
           {active && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: reduceMotion ? 0 : 0.25 }}
               className="fixed inset-0 z-[100] flex items-center justify-center p-5 lg:p-10"
               style={{ background: 'rgba(22,21,18,0.9)' }}
-              onClick={() => setActive(null)}
+              onClick={closeCertificate}
             >
               <motion.div
-                initial={{ opacity: 0, scale: 0.96 }}
+                ref={panelRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="certificate-dialog-title"
+                aria-describedby="certificate-dialog-description"
+                initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
+                transition={{ duration: reduceMotion ? 0 : 0.25, ease: 'easeOut' }}
                 className="relative max-w-3xl w-full"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -155,14 +211,15 @@ export default function Certificates() {
                 />
                 <div className="flex items-baseline justify-between gap-4 mt-4">
                   <div>
-                    <h3 className="font-display text-lg font-bold text-white">{active.title}</h3>
-                    <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{active.desc}</p>
+                    <h3 id="certificate-dialog-title" className="font-display text-lg font-bold text-white">{active.title}</h3>
+                    <p id="certificate-dialog-description" className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.72)' }}>{active.desc}</p>
                   </div>
                   <span className="text-sm font-semibold shrink-0" style={{ color: '#E8B08A' }}>{active.year}</span>
                 </div>
                 <button
-                  onClick={() => setActive(null)}
-                  className="absolute -top-12 right-0 lg:-right-12 w-10 h-10 flex items-center justify-center cursor-pointer"
+                  ref={closeRef}
+                  onClick={closeCertificate}
+                  className="absolute -top-14 right-0 lg:-right-14 w-11 h-11 flex items-center justify-center cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   style={{ border: '1px solid rgba(255,255,255,0.4)', color: '#fff' }}
                   aria-label="Kapat"
                 >

@@ -9,14 +9,16 @@ import Projects from './components/Projects'
 import Stats from './components/Stats'
 import References from './components/References'
 import Certificates from './components/Certificates'
+import LocalExpertise from './components/LocalExpertise'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 
 export default function App() {
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--text)' }} className="min-h-dvh">
+      <a href="#main-content" className="skip-link">Ana içeriğe geç</a>
       <Navbar />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <Hero />
         <Process />
         <About />
@@ -25,6 +27,7 @@ export default function App() {
         <Stats />
         <References />
         <Certificates />
+        <LocalExpertise />
         <Contact />
       </main>
       <Footer />
