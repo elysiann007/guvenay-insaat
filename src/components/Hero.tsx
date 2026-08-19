@@ -2,11 +2,10 @@ import { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform, useReducedMotion, type Variants } from 'framer-motion'
 import { ArrowRight, ArrowDown } from 'lucide-react'
 import RevealHeading from './RevealHeading'
-import { DURATION, EASE_OUT_EXPO, STAGGER, useFadeVariants, useTapFeedback } from '../lib/motion'
+import { DURATION, EASE_OUT_EXPO, useTapFeedback } from '../lib/motion'
 
 export default function Hero() {
   const tapFeedback = useTapFeedback()
-  const fadeVariants = useFadeVariants()
   const go = (href: string) => document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
   const sectionRef = useRef<HTMLElement>(null)
   const reduceMotion = useReducedMotion()
@@ -190,24 +189,25 @@ export default function Hero() {
         }}
       />
 
-      {/* Content — bottom-left editorial block, plus a bottom-right glass tag
-          card on large screens (lg:grid). On mobile the tag card stacks
-          below the CTAs as a plain flex child.
+      {/* Content — bottom-left editorial block.
+
+          lg:grid-cols-2 is kept even though only one child remains: it is
+          what holds the heading to a ~584px column, and the h1's two-line
+          break was measured against exactly that width (see RevealHeading
+          below). Widening the column would re-wrap the headline.
 
           Vertical budget on mobile is tight: pt-24 (not pt-32 — the new
           floating navbar is shorter than the old full-width bar, so less
           top clearance is needed) and the CTA row's mt-7 (not mt-9) claw
-          back ~40px so the tag card's own height plus the pb- reserved for
-          the fixed mobile CTA bar (App.tsx, ~78.4px + safe-area) still
-          fits inside min-h-svh at common 360-414px-wide/700-820px-tall
-          devices without the tag card landing behind the bar at initial
-          scroll position. Measured in-browser at 360x800: without this
-          trim the tag card's bottom sat ~27px inside the bar; with it, it
-          clears by >10px. lg: unaffected (original pt-32/mt-9/pb-14).
+          back ~40px so the block plus the pb- reserved for the fixed
+          mobile CTA bar (App.tsx, ~78.4px + safe-area) still fits inside
+          min-h-svh at common 360-414px-wide/700-820px-tall devices without
+          the CTAs landing behind the bar at initial scroll position.
+          lg: unaffected (original pt-32/mt-9/pb-14).
 
           On viewports <=700px tall (iPhone SE class) the top padding drops
           again to pt-14; combined with the reduced --text-h1 for the same
-          media query (src/index.css), this is what keeps the tag card out
+          media query (src/index.css), this is what keeps the CTA row out
           from behind the fixed CTA bar at 375x667. */}
       <div
         className="relative flex-1 flex flex-col justify-end lg:grid lg:grid-cols-2 lg:justify-normal lg:content-end lg:items-end lg:gap-10 max-w-7xl mx-auto w-full px-5 lg:px-8 pt-24 [@media(max-height:700px)]:pt-14 lg:pt-32 pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-10 lg:pb-14"
@@ -267,25 +267,6 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Glass tag card — last item in the entrance ladder. Reuses the
-            shared `cta` tier from useFadeVariants() (motion.ts) for its
-            duration/easing/travel distance instead of inventing new
-            values; only the delay is set here, as the CTA row's own
-            existing 0.62s anchor plus one more STAGGER.loose step (the
-            tier objects deliberately omit delay so callers can layer it
-            via the transition prop, same pattern used by
-            container/child stagger elsewhere on the site). */}
-        <motion.div
-          variants={fadeVariants.cta}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: reduceMotion ? 0 : 0.62 + STAGGER.loose }}
-          className="liquid-glass border border-white/20 px-6 py-3 rounded-xl w-fit mt-4 lg:mt-0 lg:justify-self-end"
-        >
-          <p className="text-lg md:text-xl lg:text-2xl font-light text-white">
-            Kazı. Boru. Kablo.
-          </p>
-        </motion.div>
       </div>
 
       {/* Scroll hint */}
