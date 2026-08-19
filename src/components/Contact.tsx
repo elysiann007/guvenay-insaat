@@ -1,14 +1,13 @@
 import { useId, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react'
+import { MapPin, Clock, Phone, Mail, Send, CheckCircle, AlertCircle } from 'lucide-react'
 import RevealHeading from './RevealHeading'
 import { useFadeVariants, VIEWPORT_ONCE, useTapFeedback } from '../lib/motion'
 
-// Telefon/e-posta satırları firmadan doğrulanmış bilgi gelene kadar burada
-// YOK — uydurma numara yayınlamaktansa yalnızca formu göstermek doğru.
-// Bkz. docs/EKSIK-BILGILER.md.
 const info = [
-  { icon: MapPin, label: 'Çalışma Bölgesi', value: 'İzmir ve Ege Bölgesi', sub: 'Metropol, OSB ve serbest bölge sahaları', href: undefined },
+  { icon: Phone, label: 'Telefon', value: '0541 311 45 35', sub: 'Hafta içi 08:00 – 18:00 arasında ulaşabilirsiniz', href: 'tel:+905413114535' },
+  { icon: Mail, label: 'E-posta', value: 'guvenayinsaat58@gmail.com', sub: 'Teklif ve proje talepleri için', href: 'mailto:guvenayinsaat58@gmail.com' },
+  { icon: MapPin, label: 'Çalışma Bölgesi', value: 'İzmir ve Ege Bölgesi', sub: 'Metropol, OSB ve serbest bölge sahaları', href: 'https://maps.app.goo.gl/bqBpUvX4tE9EG2BL6' },
   { icon: Clock, label: 'Saha Saatleri', value: 'Hafta içi 08:00 – 18:00', sub: 'Arıza müdahalelerinde gece çalışması dahil', href: undefined },
 ]
 
@@ -119,7 +118,7 @@ export default function Contact() {
     ) : null
 
   return (
-    <section id="contact" className="relative py-20 lg:py-32" style={{ background: 'var(--bg-alt)' }}>
+    <section id="contact" className="relative py-20 lg:py-32" style={{ background: 'var(--bg)' }}>
       <div className="max-w-7xl mx-auto px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-20">
           {/* Left — header + info rows */}
@@ -150,6 +149,7 @@ export default function Contact() {
                   <motion.div key={item.label} variants={fade.item}>
                     <Wrapper
                       {...(item.href ? { href: item.href } : {})}
+                      {...(item.href?.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                       className={`group flex gap-5 py-5 hairline-top last:hairline-bottom${item.href ? ' cursor-pointer' : ''}`}
                       style={{ display: 'flex' }}
                     >

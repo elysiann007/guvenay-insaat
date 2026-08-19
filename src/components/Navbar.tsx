@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Phone } from 'lucide-react'
+import Logo from './Logo'
 import { DURATION, EASE_OUT_EXPO, useTapFeedback } from '../lib/motion'
 
 const links = [
@@ -24,14 +25,16 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
     onScroll()
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   // Lock body scroll when mobile menu open
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    if (!open) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
   }, [open])
 
   // Close mobile menu on Escape
@@ -85,6 +88,7 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
+        aria-label="Ana navigasyon"
         initial={{ y: reduceMotion ? 0 : -72 }}
         animate={{ y: 0 }}
         transition={{ duration: reduceMotion ? 0 : DURATION.slower, ease: EASE_OUT_EXPO }}
@@ -108,13 +112,13 @@ export default function Navbar() {
             {/* Logo — min-h-11 gives the button a full 44px tap target even
                 though the visible mark is only 36px tall */}
             <motion.button whileTap={tapFeedback} onClick={() => handleNav('#hero')} className="flex items-center gap-3 cursor-pointer min-h-11">
-              <div
-                className={`w-9 h-9 flex items-center justify-center text-sm font-black shrink-0 font-display transition-colors duration-300 ${
-                  onDark ? 'bg-white text-[var(--ink)]' : 'bg-[var(--ink)] text-white'
+              {/* Halka bir işaret olduğu için eski "Gİ" karesindeki gibi dolu
+                  bir zemine oturtulmuyor; rengi doğrudan zeminden alıyor. */}
+              <Logo
+                className={`w-9 h-9 shrink-0 transition-colors duration-300 ${
+                  onDark ? 'text-white' : 'text-[var(--ink)]'
                 }`}
-              >
-                Gİ
-              </div>
+              />
               <span
                 className={`text-base lg:text-lg font-extrabold tracking-tight font-display transition-colors duration-300 ${
                   onDark ? 'text-white' : 'text-[var(--text)]'
@@ -143,9 +147,18 @@ export default function Navbar() {
 
             {/* CTA + hamburger — gap-2 (8px) keeps adjacent tap targets spaced */}
             <div className="flex items-center gap-2">
-              {/* Doğrulanmış telefon numarası gelene kadar tel: kısayolu yok —
-                  bkz. docs/EKSIK-BILGILER.md. Numara gelince buraya bir
-                  <a href="tel:…"> geri konacak. */}
+              <motion.a
+                whileTap={tapFeedback}
+                href="tel:+905413114535"
+                aria-label="Bizi arayın: 0541 311 45 35"
+                className={`hidden lg:inline-flex items-center justify-center w-11 h-11 rounded-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                  onDark
+                    ? 'text-white/85 hover:text-white focus-visible:text-white focus-visible:outline-white'
+                    : 'text-[var(--text-soft)] hover:text-[var(--accent)] focus-visible:text-[var(--accent)] focus-visible:outline-[var(--accent)]'
+                }`}
+              >
+                <Phone size={18} />
+              </motion.a>
               <motion.button
                 whileTap={tapFeedback}
                 onClick={() => handleNav('#contact')}
@@ -166,6 +179,7 @@ export default function Navbar() {
                 onClick={() => setOpen(!open)}
                 aria-label={open ? 'Menüyü kapat' : 'Menüyü aç'}
                 aria-expanded={open}
+                aria-controls="mobile-navigation"
               >
                 {open ? <X size={22} /> : <Menu size={22} />}
               </motion.button>
@@ -178,6 +192,7 @@ export default function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div
+            id="mobile-navigation"
             ref={menuRef}
             tabIndex={-1}
             role="dialog"
@@ -213,6 +228,14 @@ export default function Navbar() {
               transition={{ delay: reduceMotion ? 0 : 0.2, duration: reduceMotion ? 0 : 0.3 }}
               className="mt-auto pt-8 flex flex-col gap-3"
             >
+              <motion.a
+                whileTap={tapFeedback}
+                href="tel:+905413114535"
+                className="btn-secondary w-full"
+              >
+                <Phone size={16} />
+                0541 311 45 35
+              </motion.a>
               <motion.button whileTap={tapFeedback} onClick={() => handleNav('#contact')} className="btn-primary w-full">
                 Ücretsiz Teklif Al
               </motion.button>

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
-import { MapPin, ArrowUp } from 'lucide-react'
+import { MapPin, Phone, Mail, ArrowUp } from 'lucide-react'
+import Logo from './Logo'
 import { useTapFeedback } from '../lib/motion'
 
 // Her bağlantı sayfada gerçekten var olan bir bölüme gider. Var olmayan
@@ -17,6 +18,7 @@ const footerLinks = {
     { label: 'Nasıl Çalışıyoruz', href: '#process' },
     { label: 'Seçilmiş İşlerimiz', href: '#projects' },
     { label: 'Çalıştığımız Kurumlar', href: '#references' },
+    { label: 'İzmir Altyapı Rehberi', href: '#izmir-altyapi' },
     { label: 'Teklif Al', href: '#contact' },
   ],
 }
@@ -34,9 +36,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-9 h-9 flex items-center justify-center text-sm font-black font-display bg-white text-[var(--ink)]">
-                Gİ
-              </div>
+              <Logo className="w-9 h-9 shrink-0 text-white" />
               <span className="text-lg font-extrabold text-white font-display tracking-tight">
                 Güvenay İnşaat
               </span>
@@ -46,13 +46,30 @@ export default function Footer() {
               kablo serimi, trafo temeli ve boru altyapısı imalatı yapıyoruz.
             </p>
 
-            {/* Telefon/e-posta satırları firmadan doğrulanmış bilgi gelene
-                kadar yok — bkz. docs/EKSIK-BILGILER.md. */}
             <address className="flex flex-col not-italic">
-              <span className="flex items-center gap-2.5 min-h-11 py-2 text-sm text-white/65">
+              <a
+                href="tel:+905413114535"
+                className="flex items-center gap-2.5 min-h-11 py-2 text-sm text-white/65 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
+              >
+                <Phone size={14} className="shrink-0 text-[var(--accent)]" />
+                0541 311 45 35
+              </a>
+              <a
+                href="mailto:guvenayinsaat58@gmail.com"
+                className="flex items-center gap-2.5 min-h-11 py-2 text-sm text-white/65 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
+              >
+                <Mail size={14} className="shrink-0 text-[var(--accent)]" />
+                guvenayinsaat58@gmail.com
+              </a>
+              <a
+                href="https://maps.app.goo.gl/bqBpUvX4tE9EG2BL6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 min-h-11 py-2 text-sm text-white/65 rounded-sm transition-colors duration-200 hover:text-white focus-visible:text-white"
+              >
                 <MapPin size={14} className="shrink-0 text-[var(--accent)]" />
                 İzmir / Ege Bölgesi
-              </span>
+              </a>
             </address>
           </div>
 
@@ -86,15 +103,13 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Back to top — --accent is a single role now (ALTYAPI-PLAN §1): it
-          works unmodified as a filled control carrying a white icon. Lifted
-          clear of the mobile sticky CTA bar (App.tsx, ~78.4px tall) with a
-          16px+ gap on small screens; the bar is hidden from md: up so
-          bottom-5 is safe there. */}
+      {/* Back to top stays desktop-only. On mobile the fixed offer bar already
+          owns the bottom edge, and a second floating control can cover FAQ or
+          form actions as the viewport scrolls. */}
       <motion.button
         whileTap={tapFeedback}
         onClick={() => document.querySelector('#hero')?.scrollIntoView({ behavior: 'smooth' })}
-        className="fixed right-5 bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-5 w-12 h-12 flex items-center justify-center z-40 cursor-pointer bg-[var(--accent)] text-white rounded-sm transition-transform duration-200 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+        className="fixed right-5 bottom-5 w-12 h-12 hidden md:flex items-center justify-center z-40 cursor-pointer bg-[var(--accent)] text-white rounded-sm transition-transform duration-200 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
         aria-label="Yukarı çık"
       >
         <ArrowUp size={18} />
