@@ -5,10 +5,10 @@ import RevealHeading from './RevealHeading'
 import { useFadeVariants, VIEWPORT_ONCE, useTapFeedback } from '../lib/motion'
 
 const info = [
-  { icon: Phone, label: 'Telefon', value: '0541 311 45 35', sub: 'Hafta içi 08:00 – 18:00 arasında ulaşabilirsiniz', href: 'tel:+905413114535' },
+  { icon: Phone, label: 'Telefon', value: '0541 311 45 35', sub: 'Haftanın 7 günü, 24 saat ulaşabilirsiniz', href: 'tel:+905413114535' },
   { icon: Mail, label: 'E-posta', value: 'guvenayinsaat58@gmail.com', sub: 'Teklif ve proje talepleri için', href: 'mailto:guvenayinsaat58@gmail.com' },
   { icon: MapPin, label: 'Çalışma Bölgesi', value: 'İzmir ve Ege Bölgesi', sub: 'Metropol, OSB ve serbest bölge sahaları', href: 'https://maps.app.goo.gl/bqBpUvX4tE9EG2BL6' },
-  { icon: Clock, label: 'Saha Saatleri', value: 'Hafta içi 08:00 – 18:00', sub: 'Arıza müdahalelerinde gece çalışması dahil', href: undefined },
+  { icon: Clock, label: 'Saha Saatleri', value: '7/24 saha hizmeti', sub: 'Gece, hafta sonu ve resmi tatiller dahil', href: undefined },
 ]
 
 const projectTypes = [
