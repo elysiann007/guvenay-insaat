@@ -13,12 +13,12 @@ yayına alınmamalı. Aşağıdaki liste öncelik sırasına göre düzenlenmiş
 
 | # | Bilgi | Neden gerekli | Şu anki durum |
 |---|---|---|---|
-| 1 | **Telefon numarası** | Sitede tek bir telefon numarası yok. | Eskiden sahte bir İstanbul numarası (`0212 555 0100`) yazıyordu, kaldırıldı. Menüdeki ve footer'daki "ara" butonları da kaldırıldı. |
-| 2 | **E-posta adresi** | Teklif taleplerinin ulaşacağı adres. | Sahte `info@guvenayinsaat.com.tr` kaldırıldı. |
-| 3 | **Açık adres** | Ofis/şantiye adresi, harita ve Google için. | Sahte "Maslak Mah. No: 42, Sarıyer / İstanbul" kaldırıldı; yerine sadece "İzmir / Ege Bölgesi" yazıyor. |
+| 1 | **Telefon numarası** | Sitede tek bir telefon numarası yok. | ✅ Çözüldü — `0541 311 45 35`. Navbar (masaüstü + mobil menü), İletişim bölümü ve footer'a `tel:` bağlantısı olarak eklendi. |
+| 2 | **E-posta adresi** | Teklif taleplerinin ulaşacağı adres. | ✅ Çözüldü — `guvenayinsaat58@gmail.com`. İletişim bölümü ve footer'a `mailto:` bağlantısı olarak eklendi. Not: form hâlâ hiçbir yere göndermiyor, bkz. madde 5. |
+| 3 | **Açık adres** | Ofis/şantiye adresi, harita ve Google için. | Kısmen çözüldü — Google Haritalar linki (`https://maps.app.goo.gl/bqBpUvX4tE9EG2BL6`) İletişim bölümü ve footer'a eklendi. Yazılı açık adres (cadde/sokak/no) hâlâ eksik. |
 | 4 | **Firmanın tam ticari unvanı** | Footer'daki telif satırı ve yasal metinler için. | Sitede sadece "Güvenay İnşaat" yazıyor. Tam unvan (…Ltd. Şti. / …San. Tic. A.Ş.) gerekiyor. |
 | 5 | **İletişim formu nereye düşecek?** | **Form şu an hiçbir yere mesaj göndermiyor** — ekranda "Mesajınız Alındı" yazıyor ama mesaj kimseye ulaşmıyor. | Bir e-posta adresi verirseniz form gerçekten çalışır hale getirilir. |
-| 6 | **Logo dosyası** | Sitedeki logo şu an sadece "Gİ" harfleri. | Gönderdiğiniz videonun başında **gerçek Güvenay logosu** var (sarı kırıcı + ekskavatör kolu, siyah zemin) ama video içinden alındığı için çok düşük çözünürlükte. Logonun orijinal dosyası (tercihen `.ai`, `.eps`, `.svg` veya en az 1000px `.png`) gerekiyor. |
+| 6 | **Logo dosyası** | Sitedeki "Gİ" harfleri gerçek logoyla değiştirildi. | Kısmen çözüldü — gönderdiğiniz `güvenay logo.jpeg` (saha bayrağı fotoğrafı) esas alınarak **daire içi "g" işareti temiz vektör olarak yeniden çizildi** ve navbar, footer ile favicon'a kondu. Fotoğraf buruşuk bez üzerine çekildiği için doğrudan kullanılamadı; oranlar ölçülerek, harf biçimi Arial Bold "g" konturuyla eşleştirilerek yeniden üretildi. **Orijinal vektör dosyası (`.ai`, `.eps`, `.svg`) gelirse birebir doğru sürümle değiştirilmeli.** İki nokta teyit bekliyor: (a) bayraktaki **kurumsal mavi** sitenin sıcak turuncu vurgusuyla çakıştığı için işaret şu an tek renk (koyu zeminde beyaz, açık zeminde lacivert) — mavi istenirse uygulanır; (b) videonun başındaki **sarı kırıcı + ekskavatör kollu siyah zeminli logo** bundan farklı; hangisi güncel? |
 
 ---
 
@@ -26,7 +26,7 @@ yayına alınmamalı. Aşağıdaki liste öncelik sırasına göre düzenlenmiş
 
 | # | Konu | Soru |
 |---|---|---|
-| 7 | **Proje fotoğrafları** | "Seçilmiş İşlerimiz" bölümündeki 6 kartın her birine arşivinizden bir fotoğraf eşleştirdik. Fotoğraflar **gerçekten o işlere ait olmayabilir**. Her kart için doğru fotoğrafı belirtirseniz değiştiririz; aksi halde başlıkları "temsili fotoğraf" notuyla işaretlememiz gerekir. Kartlar: ESBAŞ Sadi TR–Döhler (2025) · TEDAŞ Metropol Arıza · GÜLER ELK. Aliağa OSB · PUNTAYELİ Trafo Temelleri · TEDAŞ Direk Dibi Betonlama · BASBAŞ Bergama. |
+| 7 | **Proje fotoğrafları** | "Seçilmiş İşlerimiz" artık 22 fotoğraflık saf bir galeri: kartlarda iş adı, müşteri ve konum iddiası **yok**, yalnızca disiplin etiketi (Kablo & Kanal / Trafo & Direk / Boru & Altyapı / Üst Kaplama) ve fotoğrafın ne gösterdiğini tarif eden alt metni var. Fotoğrafları belirli işlerle (ESBAŞ, TEDAŞ, Aliağa OSB, PUNTAYELİ, BASBAŞ…) eşleştirmek isterseniz hangi fotoğrafın hangi işe ait olduğunu bildirin, kartlara iş adı ekleyelim. |
 | 8 | **İstatistik rakamları** | Sitede dört rakam var: **32+ yıl**, **200+ tamamlanan iş**, **30+ kurumsal müşteri**, **15+ iş makinesi**. İlk üçü referans listenizden sayıldı, dördüncüsü fotoğraflardaki makineler sayılarak tahmin edildi. Doğru sayıları verirseniz güncellenir. |
 | 9 | **Referans listesi görünürlüğü** | "Çalıştığımız Kurumlar" bölümünde 24 kurum adı açıkça yazıyor (TEDAŞ, ESBAŞ, PUNTAYELİ, HABAŞ, SARKUYSAN…). Bu kurumların adını sitede yayınlamakta **sözleşmesel bir engel var mı?** Varsa hangileri çıkarılmalı? |
 | 10 | **Çalışan sayısı** | "X kişilik ekip" gibi bir rakam eklemek isterseniz. |
