@@ -1,0 +1,25 @@
+// Güvenay markası — firmanın saha bayrağındaki daire içi "g" işareti.
+//
+// Kaynak "screen shots and videos/güvenay logo.jpeg": buruşuk bir bez bayrağın
+// fotoğrafı, doğrudan kullanılamayacak kadar düşük kaliteli. İşaret bu yüzden
+// yeniden vektörleştirildi — oranlar fotoğraftan ölçüldü (dış çap = 1 kabul
+// edilerek halka kalınlığı 0.0356, harf genişliği 0.3378, harf yüksekliği
+// 0.4957) ve harf biçimi Arial Bold'un "g" konturuyla eşleşti (en/boy 0.683,
+// fotoğraftaki 0.681). Orijinal vektör dosyası (.ai/.eps/.svg) gelirse bu
+// dosya onunla değiştirilmeli — bkz. docs/EKSIK-BILGILER.md #6.
+//
+// Renk bilinçli olarak `currentColor`: işaret bulunduğu yerin metin rengini
+// alır, böylece tek dosya hem koyu hero üzerindeki şeffaf navbar'a, hem
+// kaydırılmış açık navbar'a, hem de --ink footer'a uyar. Bayraktaki kurumsal
+// mavi sitenin sıcak --accent paletiyle çakıştığı için uygulanmadı.
+export default function Logo({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" fill="none" className={className} aria-hidden="true" focusable="false">
+      <circle cx="50" cy="50" r="48.22" stroke="currentColor" strokeWidth="3.56" />
+      <path
+        d="M34.316 62.961L44.783 64.233Q45.044 66.059 45.989 66.743Q47.294 67.721 50.098 67.721Q53.684 67.721 55.478 66.645Q56.684 65.928 57.304 64.330Q57.728 63.189 57.728 60.124L57.728 55.070Q53.619 60.679 47.359 60.679Q40.381 60.679 36.305 54.777Q33.110 50.114 33.110 43.169Q33.110 34.463 37.300 29.866Q41.490 25.268 47.718 25.268Q54.141 25.268 58.315 30.909L58.315 26.051L66.890 26.051L66.890 57.124Q66.890 63.254 65.879 66.287Q64.868 69.319 63.042 71.047Q61.217 72.775 58.168 73.754Q55.119 74.732 50.456 74.732Q41.653 74.732 37.968 71.716Q34.284 68.700 34.284 64.070Q34.284 63.613 34.316 62.961M42.501 42.647Q42.501 48.158 44.636 50.717Q46.772 53.277 49.902 53.277Q53.261 53.277 55.576 50.652Q57.891 48.027 57.891 42.876Q57.891 37.496 55.673 34.887Q53.456 32.279 50.065 32.279Q46.772 32.279 44.636 34.838Q42.501 37.398 42.501 42.647"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
